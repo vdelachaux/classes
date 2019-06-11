@@ -90,7 +90,7 @@ _menuObject_ [object] := ***menu*** {(_param_ [text])}
 - _xCoord_ & _yCoord_ are the X & Y coordinates who specify of the top left corner of the pop-up menu to be displayed
 
 
-##Sample code
+## Sample code
 
 `$m:=menu                                         // Create a main menu`  `$m.append("Line 1";"fisrtLine")                  // Append a first item`     `$m.line()                                        // Append a line`    `$m.append("Line 3";"thirdLine";True)             // Append a second item with check mark`     `$s:=menu                                         // Create a sub menu`    `$s.append("Sub menu line 1";"subFisrtLine")      // Append a first item`    `$s.append("Sub menu line 2";"subSecondLine")     // Append a second item`    `$m.line()                                        // Add a line (will be automatically deleted because this is the last item)`     `$m.append("Sub menu";$s)                         // Append the sub menu to the main menu (memory is automatically released)`     `$m.popup("thirdLine")                            // Display as popup with third line selected (memory is automatically released)`     `If ($m.selected)                                 // If user select an item `      `  Case of                                        // Do something according to the user's choice`  `    : ($m.choice="fisrtLine")` 		 `      // … ` 			  `    : ($m.choice="thirdLine")`  `      // …`  `    : ($m.choice="subFisrtLine")`  `      // …`  
 `    : ($m.choice="subSecondLine")`   `      // …`   `  End case`  `End if`
