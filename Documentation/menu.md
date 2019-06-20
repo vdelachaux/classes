@@ -86,9 +86,13 @@ _menuObject_ [object] := ***menu*** {(_param_ [text])}
 
 ### Display menu as popup>*menuObject*.**popup** ( {_default_ [text] {; _xCoord_ [number] ; _yCoord_ [number }} ) -> [menuObject]
 
+or
+
+>*menuObject*.**popup** ( _default_ [text] ; _widget_ [object] ) -> [menuObject]
+
 - _default_ is the parameter of item selected by default
 - _xCoord_ & _yCoord_ are the X & Y coordinates who specify of the top left corner of the pop-up menu to be displayed
-
+- _widget_ is a widget object to use as reference to display the popup
 
 
 ## Sample code
