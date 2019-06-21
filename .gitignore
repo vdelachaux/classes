@@ -1,2 +1,17 @@
+# Ignore invisible files/folders except .gitignore
+.*
+!.gitignore
 
-.DS_Store
+# Ignore data file
+DATA/
+
+# Ignore logs & trash
+Logs/
+Trash/
+
+# Ignore derived data except the Documentation
+DerivedData/
+
+# Ignore user preferences
+userPreferences.*/
+Preferences/

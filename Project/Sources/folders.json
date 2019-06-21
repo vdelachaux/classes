@@ -1,0 +1,33 @@
+﻿{
+	"(Default Project Methods)": {},
+	"(Default Forms)": {},
+	"(Default Tables)": {},
+	"(Default Folder)": {
+		"groups": [
+			"(Default Project Methods)",
+			"(Default Forms)",
+			"(Default Tables)"
+		]
+	},
+	"classes": {
+		"methods": [
+			"window",
+			"COMPILER_classes",
+			"static",
+			"button",
+			"picture",
+			"widget",
+			"subform",
+			"database",
+			"group",
+			"thermometer",
+			"listbox",
+			"menu"
+		]
+	},
+	"trash": {
+		"groups": [
+			"(Default Folder)"
+		]
+	}
+}
