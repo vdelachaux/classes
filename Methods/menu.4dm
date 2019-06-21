@@ -37,15 +37,18 @@ If (This:C1470=Null:C1517)
 		"append";Formula:C1597(menu ("append";Choose:C955(Value type:C1509($2)=Is object:K8:27;New object:C1471("item";String:C10($1);"menu";$2);New object:C1471("item";String:C10($1);"param";$2;"mark";Bool:C1537($3)))));\
 		"insert";Formula:C1597(menu ("insert";Choose:C955(Value type:C1509($3)=Is object:K8:27;New object:C1471("item";String:C10($1);"after";Num:C11($2);"menu";$3);New object:C1471("item";String:C10($1);"after";Num:C11($2);"param";$3;"mark";Bool:C1537($4)))));\
 		"line";Formula:C1597(menu ("line"));\
+		"method";Formula:C1597(SET MENU ITEM METHOD:C982(This:C1470.ref;Choose:C955(Count parameters:C259=2;Num:C11($2);-1);String:C10($1)));\
+		"action";Formula:C1597(SET MENU ITEM PROPERTY:C973(This:C1470.ref;Choose:C955(Count parameters:C259=2;Num:C11($2);-1);Associated standard action:K28:8;$1));\
+		"shortcut";Formula:C1597(SET MENU ITEM SHORTCUT:C423(This:C1470.ref;Choose:C955(Count parameters:C259=3;$3;-1);$1;Num:C11($2)));\
+		"icon";Formula:C1597(SET MENU ITEM ICON:C984(This:C1470.ref;Choose:C955(Count parameters:C259=2;Num:C11($2);-1);"file:"+String:C10($1)));\
 		"release";Formula:C1597(RELEASE MENU:C978(This:C1470.ref));\
-		"count";Formula:C1597(Count menu items:C405(This:C1470.ref));\
+		"enable";Formula:C1597(ENABLE MENU ITEM:C149(This:C1470.ref;Choose:C955(Count parameters:C259=1;Num:C11($1);-1)));\
 		"disable";Formula:C1597(DISABLE MENU ITEM:C150(This:C1470.ref;Choose:C955(Count parameters:C259=1;Num:C11($1);-1)));\
 		"delete";Formula:C1597(DELETE MENU ITEM:C413(This:C1470.ref;Choose:C955(Count parameters:C259=1;Num:C11($1);-1)));\
 		"popup";Formula:C1597(menu ("popup";Choose:C955(Count parameters:C259=1;New object:C1471("default";String:C10($1));Choose:C955(Value type:C1509($2)=Is object:K8:27;New object:C1471("default";String:C10($1);"ref";$2);New object:C1471("default";String:C10($1);"xCoord";$2;"yCoord";$3)))));\
-		"cleanup";Formula:C1597(menu ("cleanup"))\
+		"cleanup";Formula:C1597(menu ("cleanup"));\
+		"count";Formula:C1597(Count menu items:C405(This:C1470.ref))\
 		)
-	
-	
 	
 	If (Count parameters:C259>=1)
 		
