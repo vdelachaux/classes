@@ -122,6 +122,49 @@ Else
 			End case 
 			
 			  //______________________________________________________
+		: ($1="distributeHorizontally")  // Distributes widgets, from left to right, to their optimal size
+			
+			If (Value type:C1509($o.name)=Is collection:K8:32)  // Group
+				
+				$l:=Num:C11($2.start)
+				
+				For each ($t;$o.name)
+					
+					  // Get localized width
+					OBJECT GET BEST SIZE:C717(*;$t;$Lon_width;$Lon_height)
+					
+					  // Add 10% for margins
+					$Lon_width:=Round:C94($Lon_width*1.1;0)
+					
+					  // Minimum & maximum width
+					$Lon_width:=Choose:C955($Lon_width<Num:C11($2.minWidth);Num:C11($2.minWidth);$Lon_width)
+					
+					If ($2.maxWidth#Null:C1517)
+						
+						$Lon_width:=Choose:C955($Lon_width>Num:C11($2.maxWidth);Num:C11($2.maxWidth);$Lon_width)
+						
+					End if 
+					
+					  // Get current object coordinates
+					OBJECT GET COORDINATES:C663(*;$t;$Lon_left;$Lon_top;$Lon_right;$Lon_bottom)
+					
+					  // Resize current object
+					$Lon_left:=$l
+					$Lon_right:=$Lon_left+$Lon_width
+					OBJECT SET COORDINATES:C1248(*;$t;$Lon_left;$Lon_top;$Lon_right;$Lon_bottom)
+					
+					  // Calculate the cumulative shift
+					$l:=$Lon_right+Num:C11($2.gap)
+					
+				End for each 
+				
+			Else 
+				
+				$o.bestSize()
+				
+			End if 
+			
+			  //______________________________________________________
 		: ($1="getCoordinates")  // Update widget coordinates
 			
 			OBJECT GET COORDINATES:C663(*;$o.name;$Lon_left;$Lon_top;$Lon_right;$Lon_bottom)
@@ -469,7 +512,8 @@ Else
 			  //______________________________________________________
 		: ($1="value")
 			
-			$o:=New object:C1471("value";($o.pointer())->)
+			$o:=New object:C1471(\
+				"value";($o.pointer())->)
 			
 			  //______________________________________________________
 		: ($1="setValue")
