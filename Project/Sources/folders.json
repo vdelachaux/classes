@@ -1,18 +1,21 @@
 ﻿{
 	"classes": {
 		"methods": [
-			"button",
-			"picture",
-			"widget",
 			"window",
-			"menu",
+			"widget",
+			"thermometer",
+			"svg",
 			"subform",
+			"static",
+			"process",
+			"picture",
+			"menu",
+			"listbox",
+			"group",
+			"environment",
 			"database",
 			"COMPILER_classes",
-			"group",
-			"thermometer",
-			"listbox",
-			"static"
+			"button"
 		]
 	},
 	"trash": {}
