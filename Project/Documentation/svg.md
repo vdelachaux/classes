@@ -36,7 +36,7 @@ _svgObject_ [object] := ***svg*** {(_param_ [text])}
  |  
 -------------    |-------------
 `group()`        | Creates a group
-`rect()`         | Creates a square or arectangle
+`rect()`         | Creates a square or a rectangle
 `image()`        | Put a referenced image
 `embedPicture()` | Embed a picture
 `textArea()`     | Creates a text area
@@ -47,7 +47,7 @@ _svgObject_ [object] := ***svg*** {(_param_ [text])}
 -------------  |-------------
 `position()`   | Sets the position
 `dimensions()` | Sets the dimensions
-`fill()`       | Sets the beackground color and opacity
+`fill()`       | Sets the background color and opacity
 `stroke()`     | Sets the foreground properties
 `font()`       | Sets the font properties
 `attribute()`  | Sets one attribute
@@ -62,7 +62,7 @@ _svgObject_ [object] := ***svg*** {(_param_ [text])}
 
 ## Sample code
 
-`$m:=svg`    
+`$svg:=svg`    
     
 `// My first rect`   `$svg.rect(10;10;100;20)`    
 
@@ -77,6 +77,6 @@ _svgObject_ [object] := ***svg*** {(_param_ [text])}
 
 `// My first text`   `$svg.textArea("Hello World").position(120;100).font(Null;18).fill("dimgray")`       
 
-`// Get the image and keep the reference of the svg object for later use`   `$p:=$svg.get("picture";True)`     
+`// Get the image but keep the reference of the svg object for later use`   `$p:=$svg.get("picture";True)`     
 
 `// Get the XML text (the memory is automatically released)`   `t:=$svg.get("xml")` 
