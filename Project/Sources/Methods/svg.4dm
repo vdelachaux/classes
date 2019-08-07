@@ -1,10 +1,11 @@
-//%attributes = {"invisible":true}
+//%attributes = {"invisible":true,"preemptive":"capable"}
   // ----------------------------------------------------
   // Project method : svg
   // Created #11-6-2019 by Vincent de Lachaux
   // ----------------------------------------------------
   // Description:
   // Manipulate SVG as objects
+  // THREAD_SAFE
   // ----------------------------------------------------
   // Declarations
 C_OBJECT:C1216($0)
@@ -26,19 +27,23 @@ If (False:C215)
 End if 
 
   // ----------------------------------------------------
-If (This:C1470._is=Null:C1517)
+If (This:C1470._is=Null:C1517)  // Constructor
 	
 	$o:=New object:C1471(\
 		"_is";"svg";\
 		"root";Null:C1517;\
-		"lastCreatedObject";Null:C1517;\
+		"latest";Null:C1517;\
 		"autoClose";True:C214;\
 		"success";False:C215;\
+		"errors";New collection:C1472;\
 		"picture";Null:C1517;\
 		"xml";Null:C1517;\
+		"origin";Null:C1517;\
+		"file";Null:C1517;\
 		"close";Formula:C1597(svg ("close"));\
 		"group";Formula:C1597(svg ("new";New object:C1471("what";"group";"id";$1;"options";$2)));\
 		"rect";Formula:C1597(svg ("new";Choose:C955(Count parameters:C259=3;New object:C1471("what";"rect";"x";$1;"y";$2;"options";$3);New object:C1471("what";"rect";"x";$1;"y";$2;"width";$3;"height";$4;"options";$5))));\
+		"roundedRect";Formula:C1597(svg ("new";Choose:C955(Count parameters:C259=3;New object:C1471("what";"rect";"rx";10;"x";$1;"y";$2;"options";$3);New object:C1471("what";"rect";"rx";10;"x";$1;"y";$2;"width";$3;"height";$4;"options";$5))));\
 		"image";Formula:C1597(svg ("new";New object:C1471("what";"image";"url";$1;"options";$2)));\
 		"textArea";Formula:C1597(svg ("new";New object:C1471("what";"textArea";"text";$1;"x";Num:C11($2);"y";Num:C11($3);"options";$4)));\
 		"embedPicture";Formula:C1597(svg ("new";New object:C1471("what";"embedPicture";"image";$1;"x";Num:C11($2);"y";Num:C11($3);"options";$4)));\
@@ -50,44 +55,118 @@ If (This:C1470._is=Null:C1517)
 		"attribute";Formula:C1597(svg ("set";New object:C1471("what";"attribute";"key";$1;"value";$2)));\
 		"attributes";Formula:C1597(svg ("set";New object:C1471("what";"attributes";"options";$1)));\
 		"get";Formula:C1597(svg ("get";Choose:C955(Value type:C1509($2)=Is boolean:K8:9;New object:C1471("what";String:C10($1);"keep";Bool:C1537($2);"options";$3);New object:C1471("what";String:C10($1);"options";$2)))[$1]);\
-		"show";Formula:C1597(svg ("show"));\
-		"errors";New collection:C1472\
+		"save";Formula:C1597(svg ("save";New object:C1471("what";$1;"file";$2;Choose:C955(Value type:C1509($3)=Is boolean:K8:9;"keep";"codec");$3;Choose:C955($1="picture";"keep";"dummy");$4)));\
+		"find";Formula:C1597(svg ("find";New object:C1471("xPath";$1;"option";$2)).value);\
+		"findById";Formula:C1597(svg ("findById";New object:C1471("id";$1)).value);\
+		"show";Formula:C1597(svg ("show"))\
 		)
 	
-	$t:=DOM Create XML Ref:C861("svg";"http://www.w3.org/2000/svg")
-	
-	If (Bool:C1537(OK))
+	If (Count parameters:C259>=1)
 		
-		$o.root:=$t
+		$c:=Split string:C1554($1;";")  // Optional text enumeration semicolons separated
 		
-		DOM SET XML ATTRIBUTE:C866($t;\
-			"xmlns:xlink";"http://www.w3.org/1999/xlink")
-		
-		DOM SET XML DECLARATION:C859($t;"UTF-8";True:C214)
-		XML SET OPTIONS:C1090($t;XML indentation:K45:34;Choose:C955(Is compiled mode:C492;XML no indentation:K45:36;XML with indentation:K45:35))
-		
-		$t:=DOM Create XML element:C865($o.root;"def")
-		
+		Case of 
+				
+				  //______________________________________________________
+			: ($c.indexOf("parse")#-1)  // Parse a given BLOB or Text type variable containing an SVG structure
+				
+				If ($2.variable#Null:C1517)  // Variable to parse
+					
+					If (Value type:C1509($2.variable)=Is BLOB:K8:12)
+						
+						$x:=$2.variable
+						$t:=DOM Parse XML variable:C720($x)
+						
+					Else 
+						
+						$tt:=String:C10($2.variable)
+						$t:=DOM Parse XML variable:C720($tt)
+						
+					End if 
+					
+					If (Bool:C1537(OK))
+						
+						$o.root:=$t
+						
+					End if 
+					
+				Else 
+					
+					$o.errors.push("Missing variable to parse.")
+					
+				End if 
+				
+				  //______________________________________________________
+			: ($c.indexOf("load")#-1)  // Parse a document containing an SVG structure
+				
+				If ($2#Null:C1517)  // File to load
+					
+					If (Bool:C1537($2.isFile) & Bool:C1537($2.exists))  // File to load
+						
+						$t:=DOM Parse XML source:C719($2.platformPath)
+						
+						If (Bool:C1537(OK))
+							
+							$o.root:=$t
+							$o.origin:=$2
+							
+						End if 
+						
+					Else 
+						
+						$o.errors.push("File doesn't exists: "+String:C10($2.platformPath))
+						
+					End if 
+					
+				Else 
+					
+					$o.errors.push("Missing object pathname to load.")
+					
+				End if 
+				
+				  //______________________________________________________
+		End case 
 	End if 
 	
-	$o.success:=($o.root#Null:C1517)
+	If ($o.root=Null:C1517)\
+		 & ($o.errors.length=0)  // Create a default SVG structure
+		
+		$t:=DOM Create XML Ref:C861("svg";"http://www.w3.org/2000/svg")
+		
+		If (Bool:C1537(OK))
+			
+			$o.root:=$t
+			
+			DOM SET XML ATTRIBUTE:C866($t;\
+				"xmlns:xlink";"http://www.w3.org/1999/xlink")
+			
+			DOM SET XML DECLARATION:C859($t;"UTF-8";True:C214)
+			XML SET OPTIONS:C1090($t;XML indentation:K45:34;Choose:C955(Is compiled mode:C492;XML no indentation:K45:36;XML with indentation:K45:35))
+			
+			$t:=DOM Create XML element:C865($o.root;"def")
+			
+			If (Bool:C1537(OK))
+				
+				  // Default values
+				DOM SET XML ATTRIBUTE:C866($o.root;\
+					"viewport-fill";"none";\
+					"fill";"none";\
+					"stroke";"black";\
+					"font-family";"'lucida grande','segoe UI',sans-serif";\
+					"font-size";12;\
+					"text-rendering";"geometricPrecision";\
+					"shape-rendering";"crispEdges";\
+					"preserveAspectRatio";"none")
+				
+			End if 
+		End if 
+	End if 
+	
+	$o.success:=Bool:C1537(OK) & ($o.root#Null:C1517)
 	
 	If ($o.success)
 		
-		  // Default values
-		DOM SET XML ATTRIBUTE:C866($o.root;\
-			"viewport-fill";"none";\
-			"fill";"none";\
-			"stroke";"black";\
-			"font-family";"'lucida grande',sans-serif";\
-			"font-size";12;\
-			"text-rendering";"geometricPrecision";\
-			"shape-rendering";"crispEdges";\
-			"preserveAspectRatio";"none")
-		
-		If (Count parameters:C259>=1)
-			
-			$c:=Split string:C1554($1;";")
+		If ($c.length>0)
 			
 			For each ($t;$c)
 				
@@ -128,17 +207,13 @@ If (This:C1470._is=Null:C1517)
 						End if 
 						
 						  //______________________________________________________
-					Else 
-						
-						  // A "Case of" statement should never omit "Else"
-						  //______________________________________________________
 				End case 
 			End for each 
 		End if 
 		
 	Else 
 		
-		$o.errors.push("Failed to create SVG tree.")
+		$o.errors.push("Failed to create SVG structure.")
 		
 	End if 
 	
@@ -151,7 +226,7 @@ Else
 		If ($o.root=Null:C1517)
 			
 			$o.success:=False:C215
-			$o.errors.push("The SVG tree is not valid.")
+			$o.errors.push("The SVG structure is not valid.")
 			
 		Else 
 			
@@ -163,7 +238,7 @@ Else
 			Case of 
 					
 					  //______________________________________________________
-				: ($1="new")
+				: (New collection:C1472("new";"find").indexOf($1)#-1)
 					
 					$Dom_target:=Choose:C955($oo.target#Null:C1517;String:C10($oo.target);$o.root)
 					
@@ -172,14 +247,14 @@ Else
 					
 					If ($oo.target=Null:C1517)
 						
-						If ($o.lastCreatedObject=Null:C1517)
+						If ($o.latest=Null:C1517)
 							
 							  // Target is the canvas
 							$Dom_target:=$o.root
 							
 						Else 
 							
-							$Dom_target:=$o.lastCreatedObject
+							$Dom_target:=$o.latest
 							
 						End if 
 						
@@ -190,18 +265,41 @@ Else
 					End if 
 					
 					  //______________________________________________________
+				: ($1="save")
+					
+					If ($2.file#Null:C1517)  // Given
+						
+						$file:=$2.file
+						
+					Else 
+						
+						If ($o.file#Null:C1517)  // Last saved
+							
+							$file:=$o.file
+							
+						Else 
+							
+							If ($o.origin#Null:C1517)  // Original
+								
+								$file:=$o.origin
+								
+							End if 
+						End if 
+					End if 
+					
+					  //______________________________________________________
 				: (New collection:C1472("stroke";"font").indexOf($1)#-1)
 					
 					If ($2.target=Null:C1517)
 						
-						If ($o.lastCreatedObject=Null:C1517)
+						If ($o.latest=Null:C1517)
 							
 							  // Target is the canvas
 							$Dom_target:=$o.root
 							
 						Else 
 							
-							$Dom_target:=$o.lastCreatedObject
+							$Dom_target:=$o.latest
 							
 						End if 
 						
@@ -215,6 +313,69 @@ Else
 			End case 
 			
 			Case of 
+					
+					  //=================================================================
+				: ($1="find")
+					
+					$o:=New object:C1471(\
+						"value";"0"*32)
+					
+					ARRAY TEXT:C222($aT;0x0000)
+					$aT{0}:=DOM Find XML element:C864($Dom_target;$2.xPath;$aT)
+					
+					If (Bool:C1537(OK))
+						
+						This:C1470.success:=True:C214
+						
+						If (Size of array:C274($aT)>0)
+							
+							If (Size of array:C274($aT)>1)
+								
+								ARRAY TO COLLECTION:C1563($c;$aT)
+								$o.value:=$c
+								
+							Else 
+								
+								$o.value:=$aT{0}
+								
+							End if 
+						End if 
+						
+					Else 
+						
+						This:C1470.errors.push("xPath \""+String:C10($2.xPath)+"\" not found.")
+						
+					End if 
+					
+					  //=================================================================
+				: ($1="findById")
+					
+					$o:=New object:C1471(\
+						"value";"0"*32)
+					
+					This:C1470.success:=False:C215
+					
+					If ($2.id#Null:C1517)\
+						 & (Length:C16(String:C10($2.id))>0)
+						
+						$t:=DOM Find XML element by ID:C1010(This:C1470.root;String:C10($2.id))
+						
+						If (Bool:C1537(OK))
+							
+							This:C1470.success:=True:C214
+							$o.value:=$t
+							
+						Else 
+							
+							This:C1470.errors.push("id \""+String:C10($2.id)+"\" not found.")
+							
+						End if 
+						
+					Else 
+						
+						This:C1470.errors.push("id to search is missing.")
+						
+					End if 
 					
 					  //=================================================================
 				: ($1="get")
@@ -243,7 +404,7 @@ Else
 							Else 
 								
 								$o.picture:=Null:C1517
-								$o.errors.push("Failed to convert SVG tree as picture.")
+								$o.errors.push("Failed to convert SVG structure as picture.")
 								
 							End if 
 							
@@ -268,35 +429,103 @@ Else
 							Else 
 								
 								$o.xml:=Null:C1517
-								$o.errors.push("Failed to export SVG tree as XML.")
+								$o.errors.push("Failed to export SVG structure as XML.")
 								
 							End if 
-							
-							  //______________________________________________________
-						Else 
-							
-							$o.errors.push("Unknown type for get() method ("+$Txt_object+").")
-							$o.success:=False:C215
 							
 							  //______________________________________________________
 					End case 
 					
 					  //=================================================================
-				: ($1="show")
+				: ($1="save")
 					
-					ARRAY TEXT:C222($tTxt_components;0x0000)
-					COMPONENT LIST:C1001($tTxt_components)
-					$o.success:=(Find in array:C230($tTxt_components;"4D SVG")>0)
+					Case of 
+							
+							  //______________________________________________________
+						: ($file=Null:C1517)
+							
+							$o.success:=False:C215
+							$o.errors.push("Null object pathname")
+							
+							  //______________________________________________________
+						: ($Txt_object="picture")
+							
+							  // Turn_around #ACI0093875
+							  //SVG EXPORT TO PICTURE($o.root;$p)
+							DOM EXPORT TO VAR:C863($o.root;$t)
+							$t:=Replace string:C233($t;" xmlns=\"\"";"")
+							$t:=DOM Parse XML variable:C720($t)
+							SVG EXPORT TO PICTURE:C1017($t;$p)
+							DOM CLOSE XML:C722($t)
+							  //}
+							
+							$o.success:=(Picture size:C356($p)>0)
+							
+							If ($o.success)
+								
+								WRITE PICTURE FILE:C680($file.platformPath;$p;Choose:C955($2.codec#Null:C1517;String:C10($2.codec);$file.extension))
+								$o.success:=Bool:C1537(OK)
+								
+							End if 
+							
+							If ($o.success)
+								
+								$o.picture:=$p
+								
+							End if 
+							
+							  //______________________________________________________
+						: ($Txt_object="text")
+							
+							  // Turn_around #ACI0093875
+							  //DOM EXPORT TO FILE($o.root;$Txt_pathname)
+							DOM EXPORT TO VAR:C863($o.root;$t)
+							$t:=Replace string:C233($t;" xmlns=\"\"";"")
+							$o.success:=Bool:C1537(OK)
+							
+							If ($o.success)
+								
+								$file.setText($t)
+								
+							End if 
+							
+							If ($o.success)
+								
+								$o.xml:=$t
+								
+							End if 
+							
+							  //______________________________________________________
+					End case 
 					
 					If ($o.success)
 						
-						EXECUTE METHOD:C1007("SVGTool_SHOW_IN_VIEWER";*;$o.root)
+						If ($o.autoClose)\
+							 & (Not:C34(Bool:C1537($2.keep)))
+							
+							DOM CLOSE XML:C722($o.root)
+							$o.root:=Null:C1517
+							
+						End if 
 						
 					Else 
 						
-						$o.errors.push("The component \"4D SVG\" is not avaiable.")
+						$o.errors.push("Failed to save SVG structure as "+$Txt_object+".")
 						
 					End if 
+					
+					  //=================================================================
+				: ($1="show")
+					
+					  //ARRAY TEXT($tTxt_components;0x0000)
+					  //COMPONENT LIST($tTxt_components)  //#NOT_THREAD_SAFE
+					  //$o.success:=(Find in array($tTxt_components;"4D SVG")>0)
+					  //If ($o.success)
+					EXECUTE METHOD:C1007("SVGTool_SHOW_IN_VIEWER";*;$o.root)
+					
+					  // Else
+					  //$o.errors.push("The component \"4D SVG\" is not avaiable.")
+					  // End if
 					
 					  //=================================================================
 				: ($1="close")
@@ -314,12 +543,12 @@ Else
 							  //______________________________________________________
 						: ($Txt_object="group")
 							
-							$o.lastCreatedObject:=DOM Create XML element:C865($Dom_target;"g")
+							$o.latest:=DOM Create XML element:C865($Dom_target;"g")
 							
 							If (OK=1)\
 								 & ($2.id#Null:C1517)
 								
-								DOM SET XML ATTRIBUTE:C866($o.lastCreatedObject;\
+								DOM SET XML ATTRIBUTE:C866($o.latest;\
 									"id";String:C10($2.id))
 								
 							End if 
@@ -327,25 +556,17 @@ Else
 							  //______________________________________________________
 						: ($Txt_object="rect")
 							
-							$o.lastCreatedObject:=DOM Create XML element:C865($Dom_target;"rect";\
+							$o.latest:=DOM Create XML element:C865($Dom_target;"rect";\
 								"x";Num:C11($2.x);\
 								"y";Num:C11($2.y);\
 								"width";Num:C11($2.width);\
 								"height";Num:C11($2.height))
 							
 							If (OK=1)\
-								 & ($oo.rx#Null:C1517)
+								 & ($2.rx#Null:C1517)  // roundedRect
 								
-								DOM SET XML ATTRIBUTE:C866($o.lastCreatedObject;\
-									"rx";Num:C11($oo.rx))
-								
-							End if 
-							
-							If (OK=1)\
-								 & ($oo.ry#Null:C1517)
-								
-								DOM SET XML ATTRIBUTE:C866($o.lastCreatedObject;\
-									"ry";Num:C11($oo.ry))
+								DOM SET XML ATTRIBUTE:C866($o.latest;\
+									"rx";Num:C11($2.rx))
 								
 							End if 
 							
@@ -393,7 +614,7 @@ Else
 											+Choose:C955(Is Windows:C1573;"/";"")\
 											+Replace string:C233($file.path;" ";"%20")
 										
-										$o.lastCreatedObject:=DOM Create XML element:C865($Dom_target;"image";\
+										$o.latest:=DOM Create XML element:C865($Dom_target;"image";\
 											"xlink:href";$t;\
 											"x";Num:C11($oo.left);\
 											"y";Num:C11($oo.top);\
@@ -434,7 +655,7 @@ Else
 										  // Put the encoded image
 										PICTURE PROPERTIES:C457($p;$Num_width;$Num_height)
 										
-										$o.lastCreatedObject:=DOM Create XML element:C865($Dom_target;"image";\
+										$o.latest:=DOM Create XML element:C865($Dom_target;"image";\
 											"xlink:href";"data:;base64,"+$t;\
 											"x";$2.x;\
 											"y";$2.y;\
@@ -455,7 +676,7 @@ Else
 							
 							$t:=Replace string:C233(String:C10($2.text);"\r\n";"\r")
 							
-							$o.lastCreatedObject:=DOM Create XML element:C865($Dom_target;"textArea";\
+							$o.latest:=DOM Create XML element:C865($Dom_target;"textArea";\
 								"x";$2.x;\
 								"y";$2.y;\
 								"width";Choose:C955($oo.width=Null:C1517;"auto";Num:C11($oo.width));\
@@ -480,11 +701,11 @@ Else
 										
 										If (Length:C16($tt)>0)
 											
-											$Dom_:=DOM Append XML child node:C1080($o.lastCreatedObject;XML DATA:K45:12;$tt)
+											$Dom_:=DOM Append XML child node:C1080($o.latest;XML DATA:K45:12;$tt)
 											
 										End if 
 										
-										$Dom_:=DOM Append XML child node:C1080($o.lastCreatedObject;XML ELEMENT:K45:20;"tbreak")
+										$Dom_:=DOM Append XML child node:C1080($o.latest;XML ELEMENT:K45:20;"tbreak")
 										
 										$t:=Delete string:C232($t;1;Length:C16($tt)+1)
 										
@@ -492,7 +713,7 @@ Else
 										
 										If (Length:C16($t)>0)
 											
-											$Dom_:=DOM Append XML child node:C1080($o.lastCreatedObject;XML DATA:K45:12;$t)
+											$Dom_:=DOM Append XML child node:C1080($o.latest;XML DATA:K45:12;$t)
 											
 										End if 
 									End if 
@@ -515,7 +736,7 @@ Else
 						
 						If ($oo#Null:C1517)
 							
-							$c:=New collection:C1472("target";"rx";"ryx";"left";"top";"width";"height";"codec")
+							$c:=New collection:C1472("target";"left";"top";"width";"height";"codec")
 							
 							For each ($t;$oo)
 								
@@ -524,7 +745,7 @@ Else
 									If (Length:C16($t)#0)\
 										 & ($oo[$t]#Null:C1517)
 										
-										DOM SET XML ATTRIBUTE:C866($o.lastCreatedObject;\
+										DOM SET XML ATTRIBUTE:C866($o.latest;\
 											$t;$oo[$t])
 										
 									Else 
@@ -990,9 +1211,9 @@ Else
 		End if 
 	End if 
 	
-	If (Not:C34($o.success))
+	If (Not:C34(This:C1470.success))
 		
-		$o.errors.push($1+" "+String:C10($2.what)+" failed")
+		This:C1470.errors.push($1+" "+String:C10($2.what)+" failed")
 		
 	End if 
 End if 
