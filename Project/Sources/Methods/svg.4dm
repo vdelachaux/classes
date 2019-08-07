@@ -56,7 +56,7 @@ If (This:C1470._is=Null:C1517)  // Constructor
 		"attributes";Formula:C1597(svg ("set";New object:C1471("what";"attributes";"options";$1)));\
 		"get";Formula:C1597(svg ("get";Choose:C955(Value type:C1509($2)=Is boolean:K8:9;New object:C1471("what";String:C10($1);"keep";Bool:C1537($2);"options";$3);New object:C1471("what";String:C10($1);"options";$2)))[$1]);\
 		"save";Formula:C1597(svg ("save";New object:C1471("what";$1;"file";$2;Choose:C955(Value type:C1509($3)=Is boolean:K8:9;"keep";"codec");$3;Choose:C955($1="picture";"keep";"dummy");$4)));\
-		"find";Formula:C1597(svg ("find";New object:C1471("xPath";$1;"option";$2)).value);\
+		"findByPath";Formula:C1597(svg ("findByPath";New object:C1471("xPath";$1;"option";$2)).value);\
 		"findById";Formula:C1597(svg ("findById";New object:C1471("id";$1)).value);\
 		"show";Formula:C1597(svg ("show"))\
 		)
@@ -238,7 +238,7 @@ Else
 			Case of 
 					
 					  //______________________________________________________
-				: (New collection:C1472("new";"find").indexOf($1)#-1)
+				: (New collection:C1472("new";"findByPath").indexOf($1)#-1)
 					
 					$Dom_target:=Choose:C955($oo.target#Null:C1517;String:C10($oo.target);$o.root)
 					
@@ -315,15 +315,16 @@ Else
 			Case of 
 					
 					  //=================================================================
-				: ($1="find")
+				: ($1="findByPath")
 					
 					$o:=New object:C1471(\
 						"value";"0"*32)
 					
 					ARRAY TEXT:C222($aT;0x0000)
 					$aT{0}:=DOM Find XML element:C864($Dom_target;$2.xPath;$aT)
+					This:C1470.success:=Bool:C1537(OK)
 					
-					If (Bool:C1537(OK))
+					If (This:C1470.success)
 						
 						This:C1470.success:=True:C214
 						
@@ -331,8 +332,8 @@ Else
 							
 							If (Size of array:C274($aT)>1)
 								
-								ARRAY TO COLLECTION:C1563($c;$aT)
-								$o.value:=$c
+								$o.value:=New collection:C1472
+								ARRAY TO COLLECTION:C1563($o.value;$aT)
 								
 							Else 
 								

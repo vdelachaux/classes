@@ -25,11 +25,11 @@ Default values for a created SVG structure are:
 ------------ |-------------                                                                                   |-------------
 *root*       | The XML reference of the SVG tree                                                              |
 *latest*     | The XML reference of the last created object using a creation member method                    | Null
-*picture*    | The image generated of the last `get ("picture")` call                                         | Null
-*xml*        | The XML text generated from the last `get ("xml")` call                                        | Null
-*autoClose*  | A boolean that indicates whether the xml tree should be closed a `get()` or `save()` call      | True 
 *success*    | A boolean that indicates whether a member method call was successfully executed                |
 *errors*     | A collection of textual descriptions of encountered errors                                     | [ ]
+*autoClose*  | A boolean that indicates whether the xml tree should be closed a `get()` or `save()` call      | True 
+*picture*    | The image generated of the last `get ("picture")` call                                         | Null
+*xml*        | The XML text generated from the last `get ("xml")` call                                        | Null
 *origin*     | The object pathname of a file initially loaded                                                 | Null
 *file*       | The object pathname of the last `save()` call                                                  | Null
 
@@ -76,32 +76,11 @@ Default values for a created SVG structure are:
  |  
 -------------  |-------------
 `get()`        | Returns the picture or the text generated from the SVG tree (Also populates the *picture* or *xml* property if success).
-`find()`       | Searches for one or more elements corresponding to an XPath & returns its reference or a collection if any.
+`findByPath()` | Searches for one or more elements corresponding to an XPath & returns its reference or a collection if any.
 `findById()`   | Searches for the element whose id attribute equals the value passed & Returns its reference, if found.
 `show()`       | Display the SVG picture & tree into the SVG Viewer if the component 4D SVG is available.
 
 ## Sample code
-
-`$svg:=svg`    
-    
-`// My first rect`   `$svg.rect(10;10;100;20)`    
-
-`// Pass optional attributes if you need`        `$svg.rect(120;10;100;20;New object("stroke";"blue";"fill";"white";"stroke-width";2))`    
-
-`// Or use svg methods if available`   
-`// You can always add unmanaged attributes with attribute() or attributes()`   `$svg.rect(230;10;100;20).stroke("green").fill("orangered";50).attributes(New object("stroke-width";2;"stroke-dasharray";"2,2")`     
-
-`// Create a group with id "test" & keep its reference`   `$g:=$svg.group("test").latest`    
-
-`// Create a rounded square into the group`   `$svg.rect(0;0;New object("target";$g;"rx";5)).dimensions(50).fill("yellow").stroke("red").position(20;40)`    
-
-`// My first text`   `$svg.textArea("Hello World").position(120;100).font(Null;18).fill("dimgray")`       
-
-`// Get the image (but keep the SVG tree in memory for later use)`   `$p:=$svg.get("picture";True)`     
-
-`// Save as XML file to the desktop (but keep the SVG tree in memory for later use)`   `$svg.save("text";Folder(fk desktop folder).file("test svg.xml");True)` 
-
-`// Save as PNG file to the desktop (the memory is automatically released)`   `$svg.save("picture";Folder(fk desktop folder).file("test svg.png"))` 
 
 	$svg:=svg
 	
@@ -117,7 +96,11 @@ Default values for a created SVG structure are:
 	
 	// Create a group with id "test" & keep its reference	$g:=$svg.group("test").latest
 	
-	// Create a rounded square into the group	$svg.rect(0;0;New object("target";$g;"rx";5)).dimensions(50).fill("yellow").stroke("red").position(20;40)
+	// Create a rounded square into the group	$svg.rect(0;0;New object("target";$g;"rx";5))\
+		.dimensions(50)\
+		.fill("yellow")\
+		.stroke("red")\
+		.position(20;40)
 	
 	// My first text	$svg.textArea("Hello World").position(120;100).font(Null;18).fill("dimgray")
 	
