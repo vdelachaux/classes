@@ -42,7 +42,7 @@ _svgObject_ [object] := ***svg*** {(_param_ [text] { ; _options_ [object] } )}
 *file*       | The object pathname of the last `save()` call                                                  | Null
 
 
-***Notes:*** 
+**Notes**: 
 
 >* If a setting member method is called before the creation of an object in the canvas, the target is canvas itself, otherwise the target is the last created object. Where appropriate, the target of the method can be given (see above)
 >* Remember that you can still add unmanaged attributes for the moment with the member methods attribute() or attributes() (see above)

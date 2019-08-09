@@ -1,11 +1,11 @@
 //%attributes = {"invisible":true,"preemptive":"capable"}
   // ----------------------------------------------------
   // Project method : svg
-  // Created #11-6-2019 by Vincent de Lachaux
+  // Created 11-6-2019 by Vincent de Lachaux
   // ----------------------------------------------------
   // Description:
   // Manipulate SVG as objects
-  // THREAD_SAFE
+  // #THREAD-SAFE
   // ----------------------------------------------------
   // Declarations
 C_OBJECT:C1216($0)
@@ -17,7 +17,7 @@ C_LONGINT:C283($i)
 C_PICTURE:C286($p)
 C_REAL:C285($Num_height;$Num_width)
 C_TEXT:C284($Dom_;$Dom_target;$t;$tt;$Txt_object)
-C_OBJECT:C1216($file;$o;$oo)
+C_OBJECT:C1216($file;$o;$oo;$signal)
 C_COLLECTION:C1488($c)
 
 If (False:C215)
@@ -40,6 +40,7 @@ If (This:C1470._is=Null:C1517)  // Constructor
 		"xml";Null:C1517;\
 		"origin";Null:C1517;\
 		"file";Null:C1517;\
+		"pocessingInstruction";Formula:C1597(svg ("pocessingInstruction";New object:C1471("value";$1)));\
 		"close";Formula:C1597(svg ("close"));\
 		"group";Formula:C1597(svg ("new";New object:C1471("what";"group";"id";$1;"options";$2)));\
 		"rect";Formula:C1597(svg ("new";Choose:C955(Count parameters:C259=3;New object:C1471("what";"rect";"x";$1;"y";$2;"options";$3);New object:C1471("what";"rect";"x";$1;"y";$2;"width";$3;"height";$4;"options";$5))));\
@@ -525,15 +526,41 @@ Else
 					  //=================================================================
 				: ($1="show")
 					
-					  //ARRAY TEXT($tTxt_components;0x0000)
-					  //COMPONENT LIST($tTxt_components)  //#NOT_THREAD_SAFE
-					  //$o.success:=(Find in array($tTxt_components;"4D SVG")>0)
-					  //If ($o.success)
-					EXECUTE METHOD:C1007("SVGTool_SHOW_IN_VIEWER";*;$o.root)
+					$signal:=New signal:C1641("CALL_MAIN_PROCESS")
+					CALL WORKER:C1389(1;"CALL_MAIN_PROCESS";$signal;"listOfLoadedComponents")
 					
-					  // Else
-					  //$o.errors.push("The component \"4D SVG\" is not avaiable.")
-					  // End if
+					$o.success:=False:C215
+					
+					If ($signal.wait(1))
+						
+						If ($signal.value.indexOf("4D SVG")#-1)
+							
+							$o.success:=True:C214
+							EXECUTE METHOD:C1007("SVGTool_SHOW_IN_VIEWER";*;$o.root)
+							
+						Else 
+							
+							$o.errors.push("The component \"4D SVG\" is not avaiable.")
+							
+						End if 
+					End if 
+					
+					  //=================================================================
+				: ($1="pocessingInstruction")
+					
+					If ($2.value#Null:C1517)
+						
+						$t:=String:C10($2.value)
+						$t:=DOM Append XML child node:C1080($o.root;XML processing instruction:K45:9;$t)
+						
+					Else 
+						
+						$o.errors.push("Missing instruction to set.")
+						OK:=0
+						
+					End if 
+					
+					$o.success:=Bool:C1537(OK)
 					
 					  //=================================================================
 				: ($1="close")
@@ -1008,7 +1035,7 @@ Else
 									
 								Else 
 									
-									  // Remove ?
+									DOM REMOVE XML ATTRIBUTE:C1084($Dom_target;$2.key)
 									
 								End if 
 								
@@ -1037,7 +1064,7 @@ Else
 											
 										Else 
 											
-											  // Remove ?
+											DOM REMOVE XML ATTRIBUTE:C1084($Dom_target;$t)
 											
 										End if 
 										
