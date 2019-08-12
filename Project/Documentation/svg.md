@@ -45,7 +45,7 @@ _svgObject_ [object] := ***svg*** {(_param_ [text] { ; _options_ [object] } )}
 **Notes**: 
 
 >* If a setting member method is called before the creation of an object in the canvas, the target is canvas itself, otherwise the target is the last created object. Where appropriate, the target of the method can be given (see above)
->* Remember that you can still add unmanaged attributes for the moment with the member methods attribute() or attributes() (see above)
+>* Remember that you can still add unmanaged attributes for the moment with the member methods setAttribute() or setAttributes() (see above)
 >* Remember that you can always use DOM XML commands to manipulate the SVG tree (*root*) or object (*latest*)
 >* With the exception of utility methods, all member methods return the _svgObject_ so that methods can be chained
 
@@ -53,40 +53,45 @@ _svgObject_ [object] := ***svg*** {(_param_ [text] { ; _options_ [object] } )}
 
 ### Creation
  |  
--------------    |-------------
-`group()`        | Creates a group
-`rect()`         | Creates a square or rectangle
-`roundRect()`    | Creates a rounded square or rectangle
-`image()`        | Puts a referenced image
-`embedPicture()` | Embeds a picture variable
-`textArea()`     | Creates a text area
+-------------      |-------------
+`group()`          | Creates a group
+`rect()`           | Creates a square or rectangle
+`roundRect()`      | Creates a rounded square or rectangle
+`image()`          | Puts a referenced image
+`embedPicture()`   | Embeds a picture variable
+`textArea()`       | Creates a text area
 
 
 ### Settings
  |  
--------------  |-------------
-`position()`   | Sets the position
-`dimensions()` | Sets the dimensions
-`fill()`       | Sets the background color and opacity
-`stroke()`     | Sets the foreground properties
-`font()`       | Sets the font properties
-`attribute()`  | Sets one attribute
-`attributes()` | Sets one or more attributes
+-------------      |-------------
+`setAttribute()`   | Sets one attribute
+`setAttributes()`  | Sets one or more attributes
+`setPosition()`    | Sets the position
+`setDimensions()`  | Sets the dimensions
+`setFill()`        | Sets the background color and opacity
+`setStroke()`      | Sets the foreground properties
+`setFont()`        | Sets the font properties
+`setVisible()`     | Sets the visibility of an element
+`setStyleSheet()`  | Adds a reference to an external style sheet.
 
 ### Document
  |  
--------------  |-------------
-`save()`       | Save the SVG structure as `text` or `picture` file (Also populates the *picture* or *xml* property if success).
-`close()`      | Releases the XML tree from the memory.
+-------------      |-------------
+`savePicture()`    | Save the SVG structure as `picture` file (Also populates the *picture* property if success).
+`saveText()`       | Save the SVG structure as `text` file (Also populates the *xml* property if success).
+`save()`           | Save the SVG structure into the loaded file (Also populates the *picture* or *xml* property if success).
+`close()`          | Releases the XML tree from the memory.
 
 
 ### Utilities
  |  
--------------  |-------------
-`get()`        | Returns the picture or the text generated from the SVG tree (Also populates the *picture* or *xml* property if success).
-`findByPath()` | Searches for one or more elements corresponding to an XPath & returns its reference or a collection if any.
-`findById()`   | Searches for the element whose id attribute equals the value passed & Returns its reference, if found.
-`show()`       | Display the SVG picture & tree into the SVG Viewer if the component 4D SVG is available.
+-------------      |-------------
+`getPicture()`     | Returns the picture generated from the SVG tree (Also populates the *picture* property if success).
+`getText()`        | Returns the text generated from the SVG tree (Also populates the *xml* property if success).
+`findByPath()`     | Searches for one or more elements corresponding to an XPath & returns its reference or a collection if any.
+`findById()`       | Searches for the element whose id attribute equals the value passed & Returns its reference, if found.
+`showInViewer()`   | Display the SVG picture & tree into the SVG Viewer if the component 4D SVG is available.
 
 ## Sample code
 
@@ -98,23 +103,23 @@ _svgObject_ [object] := ***svg*** {(_param_ [text] { ; _options_ [object] } )}
 	
 	// Or use svg methods if available
 	// You can always add unmanaged attributes with attribute() or attributes()	$svg.rect(230;10;100;20)\
-		.stroke("green")\
-		.fill("orangered";50)\
-		.attributes(New object("stroke-width";2;"stroke-dasharray";"2,2")
+		.setStroke("green")\
+		.setFill("orangered";50)\
+		.setAttributes(New object("stroke-width";2;"stroke-dasharray";"2,2")
 	
 	// Create a group with id "test" & keep its reference	$g:=$svg.group("test").latest
 	
 	// Create a rounded square into the group	$svg.rect(0;0;New object("target";$g;"rx";5))\
-		.dimensions(50)\
-		.fill("yellow")\
-		.stroke("red")\
-		.position(20;40)
+		.setDimensions(50)\
+		.setFill("yellow")\
+		.setStroke("red")\
+		.setPosition(20;40)
 	
-	// My first text	$svg.textArea("Hello World").position(120;100).font(Null;18).fill("dimgray")
+	// My first text	$svg.textArea("Hello World").setPosition(120;100).setFont(Null;18).setFill("dimgray")
 	
-	// Get the image (but keep the SVG tree in memory for later use)	$p:=$svg.get("picture";True)
+	// Get the image (but keep the SVG tree in memory for later use)	$p:=$svg.getPicture(True)
 	
-	// Save as XML file to the desktop (but keep the SVG tree in memory for later use)	$svg.save("text";Folder(fk desktop folder).file("test svg.xml");True)
+	// Save as XML file to the desktop (but keep the SVG tree in memory for later use)	$svg.saveText(Folder(fk desktop folder).file("test svg.xml");True)
 	
-	// Save as PNG file to the desktop (the memory is automatically released)	$svg.save("picture";Folder(fk desktop folder).file("test svg.png"))
+	// Save as PNG file to the desktop (the memory is automatically released)	$svg.savePicture(Folder(fk desktop folder).file("test svg.png"))
 
