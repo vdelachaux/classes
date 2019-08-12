@@ -455,7 +455,7 @@ Else
 							$o.errors.push("Null object pathname")
 							
 							  //______________________________________________________
-						: ($2.what=Null:C1517)  // Into the original file
+						: ($2.what=Null:C1517)  // Into the original or the latest saved file
 							
 							$2.what:=Choose:C955(New collection:C1472(".svg";".xml";".txt").indexOf($file.extension)#-1;"text";"picture")
 							$o:=svg ("save";$2)
@@ -491,7 +491,7 @@ Else
 						: ($Txt_object="text")
 							
 							  // Turn_around #ACI0093875
-							  //DOM EXPORT TO FILE($o.root;$Txt_pathname)
+							  //DOM EXPORT TO FILE($o.root;$file.platformPath)
 							DOM EXPORT TO VAR:C863($o.root;$t)
 							$t:=Replace string:C233($t;" xmlns=\"\"";"")
 							$o.success:=Bool:C1537(OK)
@@ -499,10 +499,6 @@ Else
 							If ($o.success)
 								
 								$file.setText($t)
-								
-							End if 
-							
-							If ($o.success)
 								
 								$o.xml:=$t
 								
