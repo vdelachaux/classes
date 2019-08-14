@@ -37,7 +37,7 @@ _svgObject_ [object] := ***svg*** {(_param_ [text] { ; _options_ [object] } )}
 *errors*     | A collection of textual descriptions of encountered errors                                     | [ ]
 *autoClose*  | A boolean that indicates whether the xml tree should be closed after a call to one of the `getPicture ()`, `getText ()`, `savePicture ()`, `saveText ()`, or `save ()` member methods      | True 
 *picture*    | The image generated of the last `getPicture ()` call                                         | Null
-*xml*        | The XML text generated from the last `getText ()`` call                                        | Null
+*xml*        | The XML text generated from the last `getText ()` call                                        | Null
 *origin*     | The object pathname of a file initially loaded                                                 | Null
 *file*       | The object pathname of the last `save()` call                                                  | Null
 
