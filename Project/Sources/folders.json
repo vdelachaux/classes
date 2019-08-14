@@ -1,6 +1,7 @@
 ﻿{
 	"classes": {
 		"methods": [
+			"HTU_svg",
 			"window",
 			"widget",
 			"thermometer",
