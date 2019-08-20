@@ -101,7 +101,7 @@ _svgObject_ [object] := ***svg*** {(_param_ [text] { ; _options_ [object] } )}
 	$svg.rect(10;10;100;20)
 	
 	// Pass optional attributes if you need
-	`$svg.rect(120;10;100;20;New object("stroke";"blue";"fill";"white";"stroke-width";2))
+	$svg.rect(120;10;100;20;New object("stroke";"blue";"fill";"white";"stroke-width";2))
 	
 	// Or use svg methods if available
 	// You can always add unmanaged attributes with attribute() or attributes()
