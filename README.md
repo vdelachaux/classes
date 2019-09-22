@@ -1,5 +1,5 @@
 # classes
-Thanks to 4D for providing the points notation and the Formula command. This makes it possible to use class programming in 4D to make the code more readable and intuitive.
+Thanks to 4D for providing the dot notation and the Formula command. This makes it possible to use class programming in 4D to make the code more readable and intuitive.
 
 Here is my thoughts and the results of my experiences around these incredible novelties. 
 
