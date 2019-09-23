@@ -1,22 +1,42 @@
 ﻿{
 	"classes": {
+		"groups": [
+			"others",
+			"widgets"
+		],
 		"methods": [
-			"HTU_svg",
-			"window",
-			"widget",
-			"thermometer",
-			"svg",
-			"subform",
-			"static",
-			"process",
-			"picture",
-			"menu",
-			"listbox",
-			"group",
-			"environment",
+			"COMPILER_classes"
+		]
+	},
+	"HTU": {
+		"methods": [
+			"HTU_svg"
+		]
+	},
+	"others": {
+		"methods": [
+			"class",
+			"color",
 			"database",
-			"COMPILER_classes",
-			"button"
+			"environment",
+			"menu",
+			"process",
+			"str",
+			"svg",
+			"tips",
+			"window"
+		]
+	},
+	"widgets": {
+		"methods": [
+			"button",
+			"group",
+			"listbox",
+			"picture",
+			"static",
+			"subform",
+			"thermometer",
+			"widget"
 		]
 	},
 	"trash": {}
