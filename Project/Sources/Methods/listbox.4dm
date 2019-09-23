@@ -2,7 +2,7 @@
   // ----------------------------------------------------
   // Project method : listbox
   // ID[A1E9ABBDE36648929AAA54FCE6CD1B6A]
-  // Created #14-6-2019 by Vincent de Lachaux
+  // Created 14-6-2019 by Vincent de Lachaux
   // ----------------------------------------------------
   // Description:
   // Part of the UI classes to manage listboxes
@@ -13,10 +13,10 @@ C_TEXT:C284($1)
 C_OBJECT:C1216($2)
 
 C_BOOLEAN:C305($Boo_horizontal;$Boo_vertical)
-C_LONGINT:C283($i;$Lon_bottom;$Lon_column;$Lon_left;$Lon_right;$Lon_row)
-C_LONGINT:C283($Lon_top)
+C_LONGINT:C283($i;$Lon_;$Lon_bottom;$Lon_column;$Lon_left;$Lon_right)
+C_LONGINT:C283($Lon_row;$Lon_top;$Lon_x;$Lon_y)
 C_TEXT:C284($t)
-C_OBJECT:C1216($o)
+C_OBJECT:C1216($o;$oo)
 
 If (False:C215)
 	C_OBJECT:C1216(listbox ;$0)
@@ -76,7 +76,8 @@ If (This:C1470._is=Null:C1517)
 		"selectAll";Formula:C1597(LISTBOX SELECT ROW:C912(*;This:C1470.name;0;lk replace selection:K53:1));\
 		"deselect";Formula:C1597(LISTBOX SELECT ROW:C912(*;This:C1470.name;0;lk remove from selection:K53:3));\
 		"reveal";Formula:C1597(listbox ("reveal";New object:C1471("row";Num:C11($1))));\
-		"popup";Formula:C1597(listbox ("popup";$1))\
+		"popup";Formula:C1597(listbox ("popup";$1));\
+		"clear";Formula:C1597(listbox ("clear"))\
 		)
 	
 	$o.getCoordinates()
@@ -128,11 +129,29 @@ Else
 			For ($i;1;Size of array:C274($tTxt_ColNames);1)
 				
 				$o.columns[$tTxt_ColNames{$i}]:=New object:C1471(\
-					"number";$i)
+					"number";$i;\
+					"pointer";$tPtr_ColVars{$i})
 				
 			End for 
 			
 			$o.getScrollbar()
+			
+			  //______________________________________________________
+		: ($1="clear")
+			
+			$o.getDefinition()
+			
+			For each ($oo;$o.definition)
+				
+				CLEAR VARIABLE:C89(OBJECT Get pointer:C1124(Object named:K67:5;$oo.names)->)
+				
+			End for each 
+			
+			For each ($oo;$o.definition)
+				
+				CLEAR VARIABLE:C89(OBJECT Get pointer:C1124(Object named:K67:5;$oo.names)->)
+				
+			End for each 
 			
 			  //______________________________________________________
 		: ($1="getScrollbar")  // Scroolbar status
@@ -152,7 +171,17 @@ Else
 			  //______________________________________________________
 		: ($1="cellPosition")  // Current cell indexes
 			
-			LISTBOX GET CELL POSITION:C971(*;$o.name;$Lon_column;$Lon_row)
+			If (Form event code:C388=On Clicked:K2:4)
+				
+				LISTBOX GET CELL POSITION:C971(*;$o.name;$Lon_column;$Lon_row)
+				
+			Else 
+				
+				GET MOUSE:C468($Lon_x;$Lon_y;$Lon_)
+				LISTBOX GET CELL POSITION:C971(*;$o.name;$Lon_x;$Lon_y;$Lon_column;$Lon_row)
+				
+			End if 
+			
 			$o.column:=$Lon_column
 			$o.row:=$Lon_row
 			
@@ -184,6 +213,8 @@ Else
 			
 			  //______________________________________________________
 		: ($1="popup")  // Display a pop-up menu at the right place based on the current cell
+			
+			$o.cellCoordinates()
 			
 			$Lon_left:=$o.cellBox.left
 			$Lon_bottom:=$o.cellBox.bottom
