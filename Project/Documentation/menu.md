@@ -162,6 +162,5 @@ End if
 **Note** Since all the used methods return the object menu, if you want a more concise (but less readable) code or if you want to use it in a **Formula** object, you can create and display the menu in just one line of code, by replacing lines 1 to 20 with:
 
 ```4d
-$m:=menu.append("Line 1";"fisrtLine").line().append("Line 3";"thirdLine";True).append("Sub menu";menu .append("Sub menu line 1";"subFisrtLine").append("Sub menu line 2";"subSecondLine")).popup("thirdLine")`  
-
-
+$m:=menu.append("Line 1";"fisrtLine").line().append("Line 3";"thirdLine";True).append("Sub menu";menu .append("Sub menu line 1";"subFisrtLine").append("Sub menu line 2";"subSecondLine")).popup("thirdLine")
+```
