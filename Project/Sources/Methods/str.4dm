@@ -11,12 +11,14 @@
 C_OBJECT:C1216($0)
 C_TEXT:C284($1)
 C_OBJECT:C1216($2)
+
 C_BLOB:C604($x)
 C_BOOLEAN:C305($b)
 C_LONGINT:C283($i;$l;$Lon_length;$Lon_position)
 C_TEXT:C284($t;$tt;$Txt_filtered;$Txt_pattern;$Txt_result;$Txt_separator)
 C_OBJECT:C1216($o)
-C_COLLECTION:C1488($c)
+C_COLLECTION:C1488($c;$cc)
+
 ARRAY TEXT:C222($tTxt_keywords;0)
 
 If (False:C215)
@@ -26,7 +28,7 @@ If (False:C215)
 End if 
 
   // ----------------------------------------------------
-If (This:C1470.$_is=Null:C1517)
+If (This:C1470[""]=Null:C1517)
 	
 	If (Count parameters:C259>=1)
 		
@@ -35,7 +37,7 @@ If (This:C1470.$_is=Null:C1517)
 	End if 
 	
 	$o:=New object:C1471(\
-		"$_is";"str";\
+		"";"str";\
 		"length";Length:C16($t);\
 		"value";$t;\
 		"common";Formula:C1597(str ("common";New object:C1471("with";$1;"diacritical";Bool:C1537($2))).value);\
@@ -61,6 +63,7 @@ If (This:C1470.$_is=Null:C1517)
 		"quoted";Formula:C1597("\""+String:C10(This:C1470.value)+"\"");\
 		"replace";Formula:C1597(str ("replace";New object:C1471("old";$1;"new";$2)).value);\
 		"setText";Formula:C1597(str ("setText";New object:C1471("value";String:C10($1))));\
+		"shuffle";Formula:C1597(str ("shuffle";New object:C1471("length";$1)).value);\
 		"singleQuoted";Formula:C1597("'"+String:C10(This:C1470.value)+"'");\
 		"spaceSeparated";Formula:C1597(str ("spaceSeparated").value);\
 		"toNum";Formula:C1597(str ("filter";New object:C1471("as";"numeric")).value);\
@@ -72,7 +75,8 @@ If (This:C1470.$_is=Null:C1517)
 		"urlDecode";Formula:C1597(str ("urlDecode").value);\
 		"urlEncode";Formula:C1597(str ("urlEncode").value);\
 		"wordWrap";Formula:C1597(str ("wordWrap";New object:C1471("length";$1)).value);\
-		"xmlEncode";Formula:C1597(str ("xmlEncode").value)\
+		"xmlEncode";Formula:C1597(str ("xmlEncode").value);\
+		"versionCompare";Formula:C1597(str ("versionCompare";New object:C1471("compareTo";String:C10($1);"separator";$2)).value)\
 		)
 	
 Else 
@@ -114,7 +118,42 @@ Else
 					End if 
 					
 					  //______________________________________________________
-				: ($1="urlEncode")  // Returns a URL encoded string
+				: ($1="shuffle")
+					
+					$Txt_pattern:="0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,?;.:/=+@#&([{§!)]}-_$€*`£"
+					
+					If (Length:C16(This:C1470.value)=0)
+						
+						$t:=$Txt_pattern*2
+						
+					Else 
+						
+						For each ($tt;Split string:C1554(This:C1470.value;""))
+							
+							If (Position:C15($tt;$Txt_pattern)>0)
+								
+								$t:=$t+$tt
+								
+							End if 
+						End for each 
+						
+						$t:=$t*2
+						
+					End if 
+					
+					$l:=Num:C11($2.length)
+					$Lon_length:=Choose:C955($l=0;Choose:C955(10>Length:C16($t);Length:C16($t);10);Choose:C955($l>Length:C16($t);Length:C16($t);$l))
+					
+					$l:=Length:C16($t)
+					
+					For ($i;1;$Lon_length;1)
+						
+						$o.value:=$o.value+$t[[(Random:C100%($l-1+1))+1]]
+						
+					End for 
+					
+					  //______________________________________________________
+				: ($1="urlEncode")  // Returns an URL encoded string
 					
 					  // List of safe characters
 					$t:="1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz:/.?_-$(){}~&"
@@ -142,7 +181,7 @@ Else
 					End if 
 					
 					  //______________________________________________________
-				: ($1="urlDecode")  // Returns a URL decoded string
+				: ($1="urlDecode")  // Returns an URL decoded string
 					
 					SET BLOB SIZE:C606($x;This:C1470.length+1;0)
 					$t:=This:C1470.value
@@ -768,22 +807,11 @@ Else
 					  //$o.value:=Choose($Lon_position>0;$t;"")
 					  // End for each
 					  // End if
-					  //______________________________________________________
-					  //: (Formula(process ).call().isPreemptif)
-					  //_4D THROW ERROR(New object(\
-																		"component";"CLAS";\
-																		"code";1;\
-						"description";"The method "+String($1)+"() for class "+String(This.$_is)+" can't be called in preemptive mode";\
-																		"something";"my bug"))
 					
 					  //______________________________________________________
 				: ($1="isStyled")  // Returns True if text is styled
 					
-					  //#BYPASS THREAD-SAFE COMPATIBILITY
-					$t:=Replace string:C233(String:C10(This:C1470.value);"\r\n";"\r")
-					$Txt_filtered:=Formula from string:C1601(":C1092($1)").call(Null:C1517;$t)
-					$Txt_result:=Formula from string:C1601(":C1116($1)").call(Null:C1517;$t)
-					$o.value:=($Txt_result#$Txt_filtered)
+					$o.value:=Match regex:C1019("(?i-ms)<span [^>]*>";String:C10(This:C1470.value);1)
 					
 					  //______________________________________________________
 				: ($1="insert")  // Returns an object with string after insertion (value), and positions (begin & end)
@@ -817,6 +845,62 @@ Else
 						$o.end:=$l
 						
 					End if 
+					
+					  //______________________________________________________
+				: ($1="versionCompare")  // Compare two "string version" & return:  0 if equal, 1 if content > $1 , -1 if $1 > content
+					
+					$o.value:=0  // Equal
+					
+					$t:=Choose:C955($2.separator=Null:C1517;".";String:C10($2.separator))
+					
+					$c:=Split string:C1554(This:C1470.value;$t)
+					$cc:=Split string:C1554($2.compareTo;$t)
+					
+					Case of 
+							
+							  //______________________________________________________
+						: ($c.length>$cc.length)
+							
+							$cc.resize($c.length;"0")
+							
+							  //______________________________________________________
+						: ($cc.length>$c.length)
+							
+							$c.resize($cc.length;"0")
+							
+							  //______________________________________________________
+					End case 
+					
+					For each ($t;$cc) While ($o.value=0)
+						
+						Case of 
+								
+								  //______________________________________________________
+							: (Num:C11($c[$i])>Num:C11($cc[$i]))
+								
+								$o.value:=1  // Content > $1
+								
+								  //______________________________________________________
+							: (Num:C11($c[$i])<Num:C11($cc[$i]))
+								
+								$o.value:=-1  // $1 > content
+								
+								  //______________________________________________________
+							Else 
+								
+								$i:=$i+1  // Go on
+								
+								  //______________________________________________________
+						End case 
+					End for each 
+					
+					  //______________________________________________________
+					  //: (Formula(process ).call().isPreemptif)
+					  //_4D THROW ERROR(New object(\
+												"component";"CLAS";\
+												"code";1;\
+												"description";"The method "+String($1)+"() for class "+String(This[""])+" can't be called in preemptive mode";\
+												"something";"my bug"))
 					
 					  //______________________________________________________
 				Else 
