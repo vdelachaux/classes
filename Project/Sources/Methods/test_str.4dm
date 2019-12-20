@@ -3,8 +3,6 @@ C_LONGINT:C283($i)
 C_TEXT:C284($t;$tt;$Txt_in;$Txt_out)
 C_OBJECT:C1216($o)
 
-TRY 
-
 $o:=str ()
 ASSERT:C1129(Length:C16($o.value)=0)
 ASSERT:C1129($o.length=0)
@@ -408,22 +406,3 @@ ASSERT:C1129($o.setText("9").versionCompare("9.0.1")=-1)
 ASSERT:C1129($o.setText("9 0").versionCompare("9 1 2";" ")=-1)
 ASSERT:C1129($o.setText("9 1 2").versionCompare("9 0";" ")=1)
 ASSERT:C1129($o.setText("9/1/2").versionCompare("9/0";"/")=1)
-
-  // ============================================
-ASSERT:C1129(str_cmpVersion ("9.0";"9.1.2")=-1)
-ASSERT:C1129(str_cmpVersion ("9.1.2";"9.0")=1)
-ASSERT:C1129(str_cmpVersion ("9.1.2";"9.1.2")=0)
-
-ASSERT:C1129(str_cmpVersion ("9";"9.0")=0)
-ASSERT:C1129(str_cmpVersion ("9.0.0";"9.0")=0)
-ASSERT:C1129(str_cmpVersion ("9";"9.0.0")=0)
-ASSERT:C1129(str_cmpVersion ("9.0.0";"9.0.0")=0)
-
-ASSERT:C1129(str_cmpVersion ("9";"9.0.1")=-1)
-
-ASSERT:C1129(str_cmpVersion ("9 0";"9 1 2";" ")=-1)
-ASSERT:C1129(str_cmpVersion ("9 1 2";"9 0";" ")=1)
-ASSERT:C1129(str_cmpVersion ("9/1/2";"9/0";"/")=1)
-
-
-FINALLY 
