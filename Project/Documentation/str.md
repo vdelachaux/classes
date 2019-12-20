@@ -1,8 +1,8 @@
-#str
+# str
 
 This class implements some useful methods to test and manipulate strings
 
-Take a look the "test_str" method to get some tricks
+Take a look the <a href="https://github.com/vdelachaux/classes/blob/master/Project/Sources/Methods/test_str.4dm" >test_str</a> method to get some tricks
 
 ## Syntax
 
@@ -34,14 +34,14 @@ Take a look the "test_str" method to get some tricks
 `isStyled()`|Returns True if text is a styled text
 `isTime()`|Returns True if text is a time string (DOES NOT CHECK IF THE TIME IS VALID)
 `isUrl()`|Returns True if the text conforms to the URL grammar. (DOES NOT CHECK IF THE URL IS VALID)
-`localized(resname;[text] | [collection])`|Returns the localized string & made replacement if any
+`localized(resname;[text][collection])`|Returns the localized string & made replacement if any
 `lowerCamelCase()`|Returns value as lower camelcase
 `match(pattern)`|Returns True if value match given pattern
 `occurences({value})`|Return the number of occurrences of value
 `quoted()`|Returns the text in quotes
 `replace(value or collection)`|Returns the string after replacements
 `setText()`|Set the value text of the class*
-`shuffle(length)`|Returns a shuffle string extracted from value
+`shuffle(length)`|Returns a shuffle string extracted from value (paswword generation)
 `singleQuoted()`|Returns the text in simple quotes
 `spaceSeparated()`|Returns underscored value & camelcase (lower or upper) value as space separated
 `toNum()`|Return extracted numeric from value
