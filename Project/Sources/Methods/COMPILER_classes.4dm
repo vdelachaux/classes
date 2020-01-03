@@ -1,4 +1,6 @@
 //%attributes = {"invisible":true}
+C_LONGINT:C283(httpError)
+
 If (False:C215)
 	
 	  //______________________________________________________
@@ -20,6 +22,11 @@ If (False:C215)
 	C_OBJECT:C1216(currentForm ;$0)
 	C_TEXT:C284(currentForm ;$1)
 	C_OBJECT:C1216(currentForm ;$2)
+	
+	  //______________________________________________________
+	C_OBJECT:C1216(dat ;$0)
+	C_TEXT:C284(dat ;$1)
+	C_OBJECT:C1216(dat ;$2)
 	
 	  //______________________________________________________
 	C_OBJECT:C1216(database ;$0)

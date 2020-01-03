@@ -1,11 +1,24 @@
 ﻿{
 	"classes": {
 		"groups": [
-			"others",
-			"widgets"
+			"forms",
+			"others"
 		],
 		"methods": [
 			"COMPILER_classes"
+		]
+	},
+	"forms": {
+		"methods": [
+			"button",
+			"currentForm",
+			"group",
+			"listbox",
+			"picture",
+			"static",
+			"subform",
+			"thermometer",
+			"widget"
 		]
 	},
 	"HTU": {
@@ -17,8 +30,11 @@
 		"methods": [
 			"class",
 			"color",
+			"dat",
 			"database",
 			"environment",
+			"http",
+			"lep",
 			"menu",
 			"process",
 			"str",
@@ -27,16 +43,10 @@
 			"window"
 		]
 	},
-	"widgets": {
+	"tests": {
 		"methods": [
-			"button",
-			"group",
-			"listbox",
-			"picture",
-			"static",
-			"subform",
-			"thermometer",
-			"widget"
+			"test_dat",
+			"test_str"
 		]
 	},
 	"trash": {}

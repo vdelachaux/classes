@@ -13,8 +13,10 @@ C_TEXT:C284($1)
 C_OBJECT:C1216($2)
 
 C_DATE:C307($d;$Dat_1;$Dat_2)
+C_LONGINT:C283($l;$l2)
 C_TEXT:C284($t)
 C_OBJECT:C1216($o)
+C_COLLECTION:C1488($c)
 
 If (False:C215)
 	C_OBJECT:C1216(dat ;$0)
@@ -34,14 +36,26 @@ If (This:C1470[""]=Null:C1517)  // Constructor
 	$o:=New object:C1471(\
 		"";"dat";\
 		"date";Null:C1517;\
-		"setValue";Formula:C1597(dat ("setValue";New object:C1471("value";$1)));\
-		"weekNumber";Formula:C1597(dat ("weekNumber";New object:C1471("date";$1)).result);\
 		"anniversary";Formula:C1597(dat ("anniversary";New object:C1471("date";$1)).result);\
-		"firstOfTheMonth";Formula:C1597(dat ("firstOfTheMonth";New object:C1471("date";$1)).result);\
-		"lastOfTheMonth";Formula:C1597(dat ("lastOfTheMonth";New object:C1471("date";$1)).result)\
+		"bissextile";Formula:C1597(dat ("bissextile";New object:C1471("date";$1)).result);\
+		"daysInMonth";Formula:C1597(dat ("daysInMonth";New object:C1471("date";$1)).result);\
+		"daysInYear";Formula:C1597(dat ("daysInYear";New object:C1471("date";$1)).result);\
+		"endMonth";Formula:C1597(dat ("endMonth";New object:C1471("date";$1)).result);\
+		"friday";Formula:C1597(dat ("weekDay";New object:C1471("day";"friday";"date";$1)).result);\
+		"leap";Formula:C1597(This:C1470.bissextile());\
+		"monday";Formula:C1597(dat ("weekDay";New object:C1471("day";"monday";"date";$1)).result);\
+		"saturday";Formula:C1597(dat ("weekDay";New object:C1471("day";"saturday";"date";$1)).result);\
+		"set";Formula:C1597(dat ("set";New object:C1471("value";$1)));\
+		"startMonth";Formula:C1597(dat ("startMonth";New object:C1471("date";$1)).result);\
+		"sunday";Formula:C1597(dat ("weekDay";New object:C1471("day";"sunday";"date";$1)).result);\
+		"tuesday";Formula:C1597(dat ("weekDay";New object:C1471("day";"tuesday";"date";$1)).result);\
+		"thursday";Formula:C1597(dat ("weekDay";New object:C1471("day";"thursday";"date";$1)).result);\
+		"wednesday";Formula:C1597(dat ("weekDay";New object:C1471("day";"wednesday";"date";$1)).result);\
+		"week";Formula:C1597(dat ("week";New object:C1471("number";Num:C11($1);"date";$2)).result);\
+		"weekNumber";Formula:C1597(dat ("weekNumber";New object:C1471("date";$1)).result)\
 		)
 	
-	$o.setValue($t)
+	$o.set($t)
 	
 Else 
 	
@@ -55,7 +69,7 @@ Else
 			ASSERT:C1129(False:C215;"OOPS, this method must be called from a member method")
 			
 			  //______________________________________________________
-		: ($1="setValue")
+		: ($1="set")
 			
 			Case of 
 					
@@ -68,6 +82,8 @@ Else
 				: (Value type:C1509($2.value)=Is text:K8:3)
 					
 					$d:=Current date:C33(*)
+					$l:=Split string:C1554("monday;tuesday;wednesday;thursday;friday;saturday;sunday";";").indexOf($2.value)
+					$l2:=Split string:C1554("january;february;march;april;may;june;july;august;september;october;november;december";";").indexOf($2.value)
 					
 					Case of 
 							
@@ -88,9 +104,14 @@ Else
 							$o.date:=$d+1
 							
 							  //………………………………………………………………………………………
-						: ($2.value="monday")
+						: ($l#-1)
 							
-							$o.date:=$d-((Day number:C114($d)+5)%7)
+							$o.date:=$d-((Day number:C114($d)+5)%7)+$l
+							
+							  //………………………………………………………………………………………
+						: ($l2#-1)
+							
+							$o.date:=Add to date:C393(!00-00-00!;Year of:C25($d);$l2+1;1)
 							
 							  //………………………………………………………………………………………
 						: ($2.value="christmas")  // Next christmas
@@ -122,7 +143,7 @@ Else
 							  //………………………………………………………………………………………
 						Else 
 							
-							ASSERT:C1129(False:C215;"Unknown entry point for setValue(): \""+String:C10($2.value)+"\"")
+							ASSERT:C1129(False:C215;"Unknown entry point for set(): \""+String:C10($2.value)+"\"")
 							
 							  //………………………………………………………………………………………
 					End case 
@@ -130,7 +151,7 @@ Else
 					  //______________________________________________________
 				Else 
 					
-					ASSERT:C1129(False:C215;"Wrong parameter type for setValue()")
+					ASSERT:C1129(False:C215;"Wrong parameter type for set()")
 					
 					  //______________________________________________________
 			End case 
@@ -140,13 +161,13 @@ Else
 			
 			If ($2.date#Null:C1517)
 				
-				$o.setValue(String:C10($2.date))
+				$o.set(String:C10($2.date))
 				
 			Else 
 				
 				If ($o.date=Null:C1517)
 					
-					$o.setValue()
+					$o.date:=Current date:C33(*)  // Default is current date
 					
 				End if 
 			End if 
@@ -154,22 +175,57 @@ Else
 			Case of 
 					
 					  //______________________________________________________
-				: ($1="firstOfTheMonth")
-					
-					$o.result:=Add to date:C393($o.date;0;0;-Day of:C23($o.date)+1)
-					
-					  //______________________________________________________
-				: ($1="lastOfTheMonth")
-					
-					$o.result:=Add to date:C393(!00-00-00!;Year of:C25($o.date);Month of:C24($o.date)+1;1)-1
-					
-					  //______________________________________________________
-				: ($1="anniversary")  // Next anniversary date
+				: ($1="anniversary")  // Returns the next anniversary date
 					
 					$o.result:=Add to date:C393(!00-00-00!;Year of:C25(Current date:C33(*))+1;Month of:C24($o.date);Day of:C23($o.date))
 					
 					  //______________________________________________________
-				: ($1="weekNumber")
+				: ($1="bissextile")
+					
+					$o.result:=((Add to date:C393(!00-00-00!;Year of:C25($o.date);12;31)-Add to date:C393(!00-00-00!;Year of:C25($o.date);1;1)+1)=366)
+					
+					  //______________________________________________________
+				: ($1="daysInMonth")  // Returns the number of days of the month
+					
+					$o.result:=Day of:C23(Add to date:C393(!00-00-00!;Year of:C25($o.date);Month of:C24($o.date)+1;1)-1)
+					
+					  //______________________________________________________
+				: ($1="daysInYear")  // Returns the number of days of the month
+					
+					$o.result:=Add to date:C393(!00-00-00!;Year of:C25($o.date);12;31)-Add to date:C393(!00-00-00!;Year of:C25($o.date);1;1)+1
+					
+					  //______________________________________________________
+				: ($1="endMonth")  // Returns date of the last day of the month
+					
+					$o.result:=Add to date:C393(!00-00-00!;Year of:C25($o.date);Month of:C24($o.date)+1;1)-1
+					
+					  //______________________________________________________
+				: ($1="startMonth")  // Returns date of the first day of the month
+					
+					$o.result:=Add to date:C393($o.date;0;0;-Day of:C23($o.date)+1)
+					
+					  //______________________________________________________
+				: ($1="weekDay")  // Returns the date of a day of the week. "Monday" by default
+					
+					$c:=Split string:C1554("monday;tuesday;wednesday;thursday;friday;saturday;sunday";";")
+					
+					$o.result:=$o.date-((Day number:C114($o.date)+5)%7)+$c.indexOf(String:C10($2.day))
+					
+					  //______________________________________________________
+				: ($1="week")  // Returns the monday date of a the given week
+					
+					ASSERT:C1129(($2.number>0) & ($2.number<54))
+					
+					  // Get January 4 of the year
+					$d:=Add to date:C393(!00-00-00!;Year of:C25($o.date);1;4)
+					
+					  // Monday of the first week
+					$Dat_2:=$d-((Day number:C114($d)+5)%7)
+					
+					$o.result:=Add to date:C393($Dat_2;0;0;($2.number-1)*7)
+					
+					  //______________________________________________________
+				: ($1="weekNumber")  // Returns the week number of the date
 					
 					  // Get Thursday of the week
 					$Dat_1:=Add to date:C393($o.date-((Day number:C114($o.date)+5)%7);0;0;3)
