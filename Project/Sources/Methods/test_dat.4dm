@@ -106,15 +106,21 @@ ASSERT:C1129($o.set("november").daysInMonth()=30)
 ASSERT:C1129($o.set("december").daysInMonth()=31)
 
   // --------------------------------------
-  // bissextile() & leap()
+  // bissextile() & alias leap()
+
+ASSERT:C1129($o.set(!1600-01-01!).bissextile())
+ASSERT:C1129(Not:C34($o.set(!1700-01-01!).bissextile()))
+ASSERT:C1129(Not:C34($o.set(!1800-01-01!).bissextile()))
+ASSERT:C1129(Not:C34($o.set(!1900-01-01!).bissextile()))
 ASSERT:C1129($o.set(!2000-01-01!).bissextile())
+ASSERT:C1129(Not:C34($o.set(!2100-01-01!).bissextile()))
+ASSERT:C1129(Not:C34($o.set(!2200-01-01!).bissextile()))
+ASSERT:C1129(Not:C34($o.set(!2300-01-01!).bissextile()))
+
 ASSERT:C1129($o.set(!2008-01-01!).bissextile())
 ASSERT:C1129($o.set(!2020-01-01!).bissextile())
-ASSERT:C1129(Not:C34($o.set(!1900-01-01!).bissextile()))
 
 ASSERT:C1129($o.set(!2000-01-01!).leap())
-ASSERT:C1129($o.set(!2008-01-01!).leap())
-ASSERT:C1129($o.set(!2020-01-01!).leap())
 ASSERT:C1129(Not:C34($o.set(!1900-01-01!).leap()))
 
   // --------------------------------------
@@ -169,3 +175,4 @@ $o:=dat ("christmas")
 
   // Next New year date
 $o:=dat ("newYear")
+
