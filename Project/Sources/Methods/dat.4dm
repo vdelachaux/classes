@@ -15,7 +15,7 @@ C_OBJECT:C1216($2)
 C_DATE:C307($d;$Dat_1;$Dat_2)
 C_LONGINT:C283($l;$l2)
 C_TEXT:C284($t)
-C_OBJECT:C1216($o)
+C_OBJECT:C1216($o;$o1)
 C_COLLECTION:C1488($c)
 
 If (False:C215)
@@ -40,10 +40,12 @@ If (This:C1470[""]=Null:C1517)  // Constructor
 		"bissextile";Formula:C1597(dat ("bissextile";New object:C1471("date";$1)).result);\
 		"daysInMonth";Formula:C1597(dat ("daysInMonth";New object:C1471("date";$1)).result);\
 		"daysInYear";Formula:C1597(dat ("daysInYear";New object:C1471("date";$1)).result);\
+		"easter";Formula:C1597(dat ("easter";New object:C1471("date";$1)).result);\
 		"endMonth";Formula:C1597(dat ("endMonth";New object:C1471("date";$1)).result);\
 		"friday";Formula:C1597(dat ("weekDay";New object:C1471("day";"friday";"date";$1)).result);\
-		"leap";Formula:C1597(This:C1470.bissextile());\
+		"leap";Formula:C1597(This:C1470.bissextile($1));\
 		"monday";Formula:C1597(dat ("weekDay";New object:C1471("day";"monday";"date";$1)).result);\
+		"paque";Formula:C1597(This:C1470.easter($1));\
 		"saturday";Formula:C1597(dat ("weekDay";New object:C1471("day";"saturday";"date";$1)).result);\
 		"set";Formula:C1597(dat ("set";New object:C1471("value";$1)));\
 		"startMonth";Formula:C1597(dat ("startMonth";New object:C1471("date";$1)).result);\
@@ -193,6 +195,35 @@ Else
 				: ($1="daysInYear")  // Returns the number of days of the month
 					
 					$o.result:=Add to date:C393(!00-00-00!;Year of:C25($o.date);12;31)-Add to date:C393(!00-00-00!;Year of:C25($o.date);1;1)+1
+					
+					  //______________________________________________________
+				: ($1="easter")  // Returns the Easter date of the year
+					
+					$l:=Year of:C25($o.date)
+					
+					If (Asserted:C1132(($l>=1583)\
+						 & ($l<=4100);"This calculation is only valid for the Gregorian calendar with dates between 1583 and 4100"))
+						
+						$o1:=New object:C1471(\
+							"year";$l)
+						
+						$o1.a:=$l\100
+						$o1.b:=$l%100
+						$o1.c:=(3*($o1.a+25))\4
+						$o1.d:=(3*($o1.a+25))%4
+						$o1.e:=(8*($o1.a+11))\25
+						$o1.f:=((5*$o1.a)+$o1.b)%19
+						$o1.g:=((19*$o1.f)+$o1.c-$o1.e)%30
+						$o1.h:=($o1.f+(11*$o1.g))\319
+						$o1.j:=((60*(5-$o1.d))+$o1.b)\4
+						$o1.k:=((60*(5-$o1.d))+$o1.b)%4
+						$o1.m:=((2*$o1.j)-$o1.k-$o1.g+$o1.h)%7
+						$o1.month:=($o1.g-$o1.h+$o1.m+114)\31
+						$o1.day:=(($o1.g-$o1.h+$o1.m+114)%31)+1
+						
+						$o.result:=Add to date:C393(!00-00-00!;$o1.year;$o1.month;$o1.day)
+						
+					End if 
 					
 					  //______________________________________________________
 				: ($1="endMonth")  // Returns date of the last day of the month
