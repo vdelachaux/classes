@@ -36,6 +36,7 @@
 			"http",
 			"lep",
 			"menu",
+			"ob",
 			"process",
 			"str",
 			"svg",
@@ -46,6 +47,7 @@
 	"tests": {
 		"methods": [
 			"test_dat",
+			"test_ob",
 			"test_str"
 		]
 	},
