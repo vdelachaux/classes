@@ -41,8 +41,8 @@ If (This:C1470[""]=Null:C1517)  // Constructor
 		"isCollection";Formula:C1597(Value type:C1509(This:C1470.contents)=Is collection:K8:32);\
 		"isEmpty";Formula:C1597(ob ("isEmpty").value);\
 		"isObject";Formula:C1597(Value type:C1509(This:C1470.contents)=Is object:K8:27);\
-		"testPath";Formula:C1597(ob ("testPath";New object:C1471("path";String:C10($1))).value);\
-		"set";Formula:C1597(This:C1470.contents:=$1)\
+		"set";Formula:C1597(ob ("set";New object:C1471("value";$1)));\
+		"testPath";Formula:C1597(ob ("testPath";New object:C1471("path";String:C10($1))).value)\
 		)
 	
 	If (Count parameters:C259>=1)
@@ -95,6 +95,47 @@ Else
 		: ($o=Null:C1517)
 			
 			ASSERT:C1129(False:C215;"OOPS, this method must be called from a member method")
+			
+			  //______________________________________________________
+		: ($1="set")
+			
+			If (Value type:C1509($2.value)=Is text:K8:3)
+				
+				Case of 
+						
+						  //______________________________________________________
+					: ($t="object")
+						
+						$o.contents:=New object:C1471
+						
+						  //______________________________________________________
+					: ($t="collection")
+						
+						$o.contents:=New collection:C1472
+						
+						  //______________________________________________________
+					: (Match regex:C1019("(?msi)^(?:\\{.*\\})|(?:\\[.*\\])$";$t;1))
+						
+						$o.contents:=JSON Parse:C1218($t)
+						
+						  //______________________________________________________
+						  //: (Match regex("(?msi)^\\[.*\\]$";$t;1))
+						  //JSON PARSE ARRAY($t;$ar)
+						  //$o.contents:=
+						
+						  //______________________________________________________
+					Else 
+						
+						$o.contents:=New object:C1471
+						
+						  //______________________________________________________
+				End case 
+				
+			Else 
+				
+				$o.contents:=$2.value
+				
+			End if 
 			
 			  //______________________________________________________
 		: ($1="isEmpty")

@@ -13,7 +13,7 @@ _svgObject_ [object] := ***svg*** {(_param_ [text] { ; _options_ [object] } )}
   3.  `parse` to parse a given BLOB or Text containing an SVG structure into $2.variable
   4.  `load` to parse a document containing an SVG structure given as file object into $2
   5.  `create` to create a new SVG structure (default action if no parameter passed)
-  
+
 - _svgObject_ returned object containing the XML reference in memory and associated member methods.
 
 ***Default values:***
@@ -35,29 +35,30 @@ _svgObject_ [object] := ***svg*** {(_param_ [text] { ; _options_ [object] } )}
 *latest*     | The XML reference of the last created object using a creation member method                    | Null
 *success*    | A boolean that indicates whether a member method call was successfully executed                |
 *errors*     | A collection of textual descriptions of encountered errors                                     | [ ]
-*autoClose*  | A boolean that indicates whether the xml tree should be closed after a call to one of the `getPicture ()`, `getText ()`, `savePicture ()`, `saveText ()`, or `save ()` member methods      | True* 
+*autoClose*  | A boolean that indicates whether the xml tree should be closed after a call to one of the `getPicture ()`, `getText ()`, `savePicture ()`, `saveText ()`, or `save ()` member methods      | True*
 *picture*    | The image generated of the last `getPicture ()` call                                         | Null
 *xml*        | The XML text generated from the last `getText ()` call                                        | Null
 *origin*     | The object pathname of a file initially loaded                                                 | Null
 *file*       | The object pathname of the last `save()` call                                                  | Null
 
 
-**Notes**: 
+**Notes**:
 
 >* If a setting member method is called before the creation of an object in the canvas, the target is canvas itself, otherwise the target is the last created object. Where appropriate, the target of the method can be given (see above)
 >* Remember that you can still add unmanaged attributes for the moment with the member methods setAttribute() or setAttributes() (see above)
 >* Remember that you can always use DOM XML commands to manipulate the SVG tree (*root*) or object (*latest*)
 >* With the exception of utility methods, all member methods return the _svgObject_ so that methods can be chained
 
-**WARNING**: 
+**WARNING**:
 
 > If you call the method
 
 ## Member methods
 
 ### Creation
- |  
--------------      |-------------
+
+|Method            |Action
+|-------------     |-------------
 `group()`          | Creates a group
 `rect()`           | Creates a square or rectangle
 `roundRect()`      | Creates a rounded square or rectangle
@@ -67,7 +68,8 @@ _svgObject_ [object] := ***svg*** {(_param_ [text] { ; _options_ [object] } )}
 
 
 ### Settings
- |  
+
+|Method            |Action
 -------------      |-------------
 `setAttribute()`   | Sets one attribute
 `setAttributes()`  | Sets one or more attributes
@@ -80,7 +82,8 @@ _svgObject_ [object] := ***svg*** {(_param_ [text] { ; _options_ [object] } )}
 `setStyleSheet()`  | Adds a reference to an external style sheet.
 
 ### Document
- |  
+
+|Method            |Action
 -------------      |-------------
 `savePicture()`    | Save the SVG structure as `picture` file (Also populates the *picture* property if success).
 `saveText()`       | Save the SVG structure as `text` file (Also populates the *xml* property if success).
@@ -89,8 +92,9 @@ _svgObject_ [object] := ***svg*** {(_param_ [text] { ; _options_ [object] } )}
 
 
 ### Utilities
- |  
--------------      |-------------
+
+|Method            |Action
+|-------------     |-------------
 `getPicture()`     | Returns the picture generated from the SVG tree (Also populates the *picture* property if success).
 `getText()`        | Returns the text generated from the SVG tree (Also populates the *xml* property if success).
 `findByPath()`     | Searches for one or more elements corresponding to an XPath & returns its reference or a collection if any.
@@ -113,28 +117,26 @@ $svg.rect(230;10;100;20)\
 	.setStroke("green")\
 	.setFill("orangered";50)\
 	.setAttributes(New object("stroke-width";2;"stroke-dasharray";"2,2")
-	
+
 	// Create a group with id "test" & keep its reference
 $g:=$svg.group("test").latest
-	
+
 	// Create a rounded square into the group
 $svg.rect(0;0;New object("target";$g;"rx";5))\
 	.setDimensions(50)\
 	.setFill("yellow")\
 	.setStroke("red")\
 	.setPosition(20;40)
-	
+
 	// My first text
 $svg.textArea("Hello World").setPosition(120;100).setFont(Null;18).setFill("dimgray")
-	
+
 	// Get the image (but keep the SVG tree in memory for later use)
 $p:=$svg.getPicture(True)
-	
+
 	// Save as XML file to the desktop (but keep the SVG tree in memory for later use)
 $svg.saveText(Folder(fk desktop folder).file("test svg.xml");True)
-	
+
 	// Save as PNG file to the desktop (the memory is automatically released)
 $svg.savePicture(Folder(fk desktop folder).file("test svg.png"))
 ```
-
-
