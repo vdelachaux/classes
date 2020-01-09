@@ -102,6 +102,7 @@ _svgObject_ [object] := ***svg*** {(_param_ [text] { ; _options_ [object] } )}
 `showInViewer()`   | Display the SVG picture & tree into the SVG Viewer if the component 4D SVG is available.
 
 ## Sample code
+
 ```js
 $svg:=svg
 
