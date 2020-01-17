@@ -417,18 +417,3 @@ ASSERT:C1129($o.setText("hello").truncate(5)="hello")
 ASSERT:C1129($o.setText("hello").truncate(10)="hello")
 ASSERT:C1129($o.setText("hello world").truncate(12)="hello world")
 
-  // ============================================
-ASSERT:C1129(str_cmpVersion ("9.0";"9.1.2")=-1)
-ASSERT:C1129(str_cmpVersion ("9.1.2";"9.0")=1)
-ASSERT:C1129(str_cmpVersion ("9.1.2";"9.1.2")=0)
-
-ASSERT:C1129(str_cmpVersion ("9";"9.0")=0)
-ASSERT:C1129(str_cmpVersion ("9.0.0";"9.0")=0)
-ASSERT:C1129(str_cmpVersion ("9";"9.0.0")=0)
-ASSERT:C1129(str_cmpVersion ("9.0.0";"9.0.0")=0)
-
-ASSERT:C1129(str_cmpVersion ("9";"9.0.1")=-1)
-
-ASSERT:C1129(str_cmpVersion ("9 0";"9 1 2";" ")=-1)
-ASSERT:C1129(str_cmpVersion ("9 1 2";"9 0";" ")=1)
-ASSERT:C1129(str_cmpVersion ("9/1/2";"9/0";"/")=1)
