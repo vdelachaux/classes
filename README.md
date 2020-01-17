@@ -7,4 +7,4 @@ For several years, my motivation has been to simplify code writing. The recent a
 
 This is not a "how do I" or a recommendation, but a work in progress way that may interest some developers to explore. If this is the case,  your contributions or comments will be welcome.
 
-See the [documentation](Project/Documentation/) folder
+See the [documentation](Documentation/) folder
