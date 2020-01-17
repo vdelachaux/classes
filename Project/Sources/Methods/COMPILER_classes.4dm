@@ -54,6 +54,11 @@ If (False:C215)
 	C_OBJECT:C1216(lep ;$2)
 	
 	  //______________________________________________________
+	C_OBJECT:C1216(list ;$0)
+	C_TEXT:C284(list ;$1)
+	C_OBJECT:C1216(list ;$2)
+	
+	  //______________________________________________________
 	C_OBJECT:C1216(listbox ;$0)
 	C_TEXT:C284(listbox ;$1)
 	C_OBJECT:C1216(listbox ;$2)
