@@ -5,7 +5,8 @@
 			"others"
 		],
 		"methods": [
-			"COMPILER_classes"
+			"COMPILER_classes",
+			"new"
 		]
 	},
 	"forms": {
@@ -22,19 +23,23 @@
 		]
 	},
 	"HTU": {
+		"groups": [
+			"tests"
+		],
 		"methods": [
+			"HTU_logs",
 			"HTU_svg"
 		]
 	},
 	"others": {
 		"methods": [
-			"class",
 			"color",
 			"dat",
 			"database",
 			"environment",
 			"http",
 			"lep",
+			"logs",
 			"menu",
 			"ob",
 			"process",
@@ -50,6 +55,14 @@
 			"test_dat",
 			"test_ob",
 			"test_str"
+		]
+	},
+	"tools": {
+		"methods": [
+			"HTTP ERROR HANDLER",
+			"ob deepMerge",
+			"ob findPropertyValues",
+			"ob MERGE"
 		]
 	},
 	"trash": {}
