@@ -3,8 +3,6 @@ C_TEXT:C284($t)
 C_OBJECT:C1216($o;$o1;$o2;$ob)
 C_COLLECTION:C1488($c)
 
-TRY 
-
   // === === === === === === === === === === === === === === === === === === === === constructor()
 $ob:=ob ("{}")
 ASSERT:C1129($ob.isObject())
@@ -167,9 +165,6 @@ ASSERT:C1129($o.value[1]=$ob.contents.level[0].uuid;"Must found in collection af
 
 $o:=$ob.findPropertyValues("dummy")
 ASSERT:C1129(Not:C34($o.success);"Must not found in collection")
-
-
-FINALLY 
 
 If (Structure file:C489=Structure file:C489(*))
 	
