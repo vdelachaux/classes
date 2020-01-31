@@ -134,7 +134,7 @@ or
 
 ## Sample code
 
-```js
+```4D
 $m:=menu                                         // Create a main menu
 $m.append("Line 1";"fisrtLine")                  // Append a first item
 $m.line()                                        // Append a line
