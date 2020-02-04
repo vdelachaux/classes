@@ -60,6 +60,7 @@
 	},
 	"tools": {
 		"methods": [
+			"CALL_MAIN_PROCESS",
 			"HTTP ERROR HANDLER",
 			"ob deepMerge",
 			"ob findPropertyValues",
