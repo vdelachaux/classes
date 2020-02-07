@@ -34,10 +34,13 @@
 			"database",
 			"environment",
 			"http",
+			"HTTP ERROR HANDLER",
 			"lep",
 			"menu",
 			"ob",
 			"process",
+			"rgx",
+			"RGX ERROR HANDLER",
 			"str",
 			"svg",
 			"tips",
@@ -49,6 +52,7 @@
 		"methods": [
 			"test_dat",
 			"test_ob",
+			"test_rgx",
 			"test_str"
 		]
 	},

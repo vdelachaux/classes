@@ -79,6 +79,13 @@ If (False:C215)
 	C_OBJECT:C1216(process ;$2)
 	
 	  //______________________________________________________
+	C_OBJECT:C1216(rgx ;$0)
+	C_TEXT:C284(rgx ;$1)
+	C_OBJECT:C1216(rgx ;$2)
+	
+	C_LONGINT:C283(rgxError)
+	
+	  //______________________________________________________
 	C_OBJECT:C1216(static ;$0)
 	C_TEXT:C284(static ;$1)
 	C_OBJECT:C1216(static ;$2)
