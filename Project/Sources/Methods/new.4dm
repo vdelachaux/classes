@@ -1,6 +1,6 @@
-//%attributes = {}
+//%attributes = {"invisible":true}
   // ----------------------------------------------------
-  // Project method : object
+  // Project method : new
   // ID[5543995AC5E24988A39E024B39541A8F]
   // Created 13-9-2019 by Vincent de Lachaux
   // ----------------------------------------------------
@@ -17,9 +17,9 @@ C_OBJECT:C1216($o)
 C_COLLECTION:C1488($c)
 
 If (False:C215)
-	C_OBJECT:C1216(class ;$0)
-	C_TEXT:C284(class ;$1)
-	C_TEXT:C284(class ;$2)
+	C_OBJECT:C1216(new ;$0)
+	C_TEXT:C284(new ;$1)
+	C_TEXT:C284(new ;$2)
 End if 
 
   // ----------------------------------------------------
@@ -40,7 +40,7 @@ If (This:C1470[""]=Null:C1517)  // Constructor
 			
 		End if 
 		
-		$o.constructor:=Formula:C1597(class ("constructor"))
+		$o.constructor:=Formula:C1597(new ("constructor"))
 		
 	End if 
 	
@@ -51,10 +51,7 @@ Else
 			  //______________________________________________________
 		: ($1="constructor")  // Returns collection of properties and functions
 			
-			$o:=New object:C1471(\
-				"properties";New collection:C1472;\
-				"functions";New collection:C1472;\
-				"fomulas";New collection:C1472)
+			$o:=New object:C1471("properties";New collection:C1472;"functions";New collection:C1472;"formulas";New collection:C1472)
 			
 			$c:=New collection:C1472
 			
@@ -80,7 +77,7 @@ Else
 						If (This:C1470[$t].source#Null:C1517)
 							
 							$o.functions.push($t)
-							$o.fomulas.push(This:C1470[$t].source)
+							$o.formulas.push(This:C1470[$t].source)
 							
 						Else 
 							

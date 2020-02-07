@@ -6,28 +6,28 @@ Manipulate menus as objects and make code more readable.
 
 _menuObject_ [object] := ***menu*** {(_param_ [text])}
 
-- _param_ is an optional text enumeration semicolons separated like `"keepReference;displayMetacharacters"`.
+- _param_ is an optional text enumeration semicolons separated like `"keepReference;displayMetacharacters"`
 
   1. `keepReference` indicate that the menu reference should be kept in memory after use. In this case, don't omit to [release memory](### How to remove menu from memory) when menu will no more used.
   2. `displayMetacharacters` indicate that the special characters included in the item text will be considered as metacharacters.
   
 - _menuObject_ returned object containing the menu reference in memory and associated member methods.
 
- Methods      | Action
-------------- |-------------
-.append()     | Appends new menu item to the menu
-.insert()     | Inserts new menu item into the menu
-.line()       | Appends a menu line to the menu
-.method()     | Sets the 4D project method associated with a menu item
-.action()     | Associates a standard action with a menu item
-.shortcut()   | Sets the shortcut key associated with a menu item
-.icon()       | Sets the icon associated with a menu item
-.remove()     | Deletes the menu item
-.release()    | Removes the menu from memory
-.count()      | Returns the number of menu items present in the menu 
-.disable()    | Disables a menu item
-.delete()     | Deletes a menu item
-.popup()      | Display a hierarchical pop-up of the menu
+Methods      | Action 
+:------------ |:------------- 
+.*append()*     | Appends new menu item to the menu
+.*insert()*     | Inserts new menu item into the menu
+.*line()*       | Appends a menu line to the menu
+.*method()*    | Sets the 4D project method associated with a menu item
+.*action()*     | Associates a standard action with a menu item
+.*shortcut()*   | Sets the shortcut key associated with a menu item
+.*icon()*       | Sets the icon associated with a menu item
+.*remove()*     | Deletes the menu item
+.*release()*    | Removes the menu from memory
+.*count()*      | Returns the number of menu items present in the menu 
+.*disable()*    | Disables a menu item
+.*delete()*     | Deletes a menu item
+.*popup()*      | Display a hierarchical pop-up of the menu
 	
 
 ## How to
@@ -134,7 +134,7 @@ or
 
 ## Sample code
 
-```js
+```4D
 $m:=menu                                         // Create a main menu
 $m.append("Line 1";"fisrtLine")                  // Append a first item
 $m.line()                                        // Append a line

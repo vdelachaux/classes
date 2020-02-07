@@ -103,7 +103,7 @@ _svgObject_ [object] := ***svg*** {(_param_ [text] { ; _options_ [object] } )}
 
 ## Sample code
 
-```js
+```4D
 $svg:=svg
 
 	// My first rect

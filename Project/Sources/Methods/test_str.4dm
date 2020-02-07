@@ -308,11 +308,13 @@ ASSERT:C1129($o.setText("").equal(""))
 
   // ============================================
   // urlEncode()
-ASSERT:C1129($o.setText("'Command Name' != '_@'").urlEncode()="%27Command%20Name%27%20%21%3D%20%27_%40%27")
+ASSERT:C1129($o.setText("'Command Name' != '_@'").urlEncode()="%27Command%20Name%27%20%21%3D%20%27_@%27")
+
+  //%27Command%20Name%27%20%21%3D%20%27_@%27
 
   // ============================================
   // urlDecode()
-ASSERT:C1129($o.setText("%27Command%20Name%27%20%21%3D%20%27_%40%27").urlDecode()="'Command Name' != '_@'")
+ASSERT:C1129($o.setText("%27Command%20Name%27%20%21%3D%20%27_@%27").urlDecode()="'Command Name' != '_@'")
 
   // ============================================
   // contains()
@@ -406,3 +408,14 @@ ASSERT:C1129($o.setText("9").versionCompare("9.0.1")=-1)
 ASSERT:C1129($o.setText("9 0").versionCompare("9 1 2";" ")=-1)
 ASSERT:C1129($o.setText("9 1 2").versionCompare("9 0";" ")=1)
 ASSERT:C1129($o.setText("9/1/2").versionCompare("9/0";"/")=1)
+
+  // ============================================
+  // truncate()
+ASSERT:C1129($o.setText("hello").truncate(1)="h…")
+ASSERT:C1129($o.setText("hello").truncate(2)="he…")
+ASSERT:C1129($o.setText("hello").truncate(3)="hel…")
+ASSERT:C1129($o.setText("hello").truncate(4)="hell…")
+ASSERT:C1129($o.setText("hello").truncate(5)="hello")
+ASSERT:C1129($o.setText("hello").truncate(10)="hello")
+ASSERT:C1129($o.setText("hello world").truncate(12)="hello world")
+
