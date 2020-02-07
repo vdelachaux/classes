@@ -24,9 +24,6 @@
 		]
 	},
 	"HTU": {
-		"groups": [
-			"tests"
-		],
 		"methods": [
 			"HTU_logs",
 			"HTU_svg"
@@ -65,7 +62,7 @@
 	"tools": {
 		"methods": [
 			"CALL_MAIN_PROCESS",
-			"HTTP ERROR HANDLER",
+			"COMPILER_tools",
 			"ob deepMerge",
 			"ob findPropertyValues",
 			"ob MERGE"
