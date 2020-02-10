@@ -16,7 +16,6 @@
 			"group",
 			"listbox",
 			"picture",
-			"progress",
 			"static",
 			"subform",
 			"thermometer",
@@ -25,8 +24,11 @@
 	},
 	"HTU": {
 		"methods": [
+			"COMPILER_HTU",
 			"HTU_logs",
-			"HTU_svg"
+			"HTU_progress",
+			"HTU_svg",
+			"htuProgressDoSomething"
 		]
 	},
 	"others": {
@@ -41,7 +43,11 @@
 			"logger",
 			"menu",
 			"ob",
+			"ob deepMerge",
+			"ob findPropertyValues",
+			"ob MERGE",
 			"process",
+			"progress",
 			"rgx",
 			"RGX ERROR HANDLER",
 			"str",
@@ -62,10 +68,7 @@
 	"tools": {
 		"methods": [
 			"CALL_MAIN_PROCESS",
-			"COMPILER_tools",
-			"ob deepMerge",
-			"ob findPropertyValues",
-			"ob MERGE"
+			"COMPILER_tools"
 		]
 	},
 	"trash": {}
