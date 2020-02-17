@@ -1,6 +1,7 @@
 [![language](https://img.shields.io/static/v1?label=language&message=4d&color=blue)](https://developer.4d.com/)
 [![language](https://img.shields.io/github/languages/top/vdelachaux/classes.svg)](https://developer.4d.com/)
 ![code-size](https://img.shields.io/github/languages/code-size/vdelachaux/classes.svg)
+[![license](https://img.shields.io/github/license/vdelachaux/classes)](LICENSE)
 
 Thanks to 4D for providing the dot notation and the Formula command. This makes it possible to use class programming in 4D to make the code more readable and intuitive.
 
