@@ -104,6 +104,7 @@ _svgObject_ [object] := ***svg*** {(_param_ [text] { ; _options_ [object] } )}
 ## Sample code
 
 ```4D
+    // Create a new canvas
 $svg:=svg
 
 	// My first rect
