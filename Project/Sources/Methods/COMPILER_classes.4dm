@@ -117,6 +117,11 @@ If (False:C215)  // Tools
 	C_OBJECT:C1216(environment ;$2)
 	
 	  //______________________________________________________
+	C_OBJECT:C1216(git ;$0)
+	C_VARIANT:C1683(git ;$1)
+	C_VARIANT:C1683(git ;$2)
+	
+	  //______________________________________________________
 	C_LONGINT:C283(httpError)
 	C_OBJECT:C1216(http ;$0)
 	C_TEXT:C284(http ;$1)
