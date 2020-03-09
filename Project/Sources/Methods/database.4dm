@@ -76,18 +76,22 @@ If (This:C1470[""]=Null:C1517)
 	
 	$l:=Get database parameter:C643(User param value:K37:94;$t)
 	
-	Case of 
+Case of 
 			
 			  //______________________________________________________
-		: ($t="{@")\
-			 & ($t="@}")  // json object
+		: (Length:C16($t)=0)
+			
+			  // <NOTHING MORE TO DO>
+			
+			  //______________________________________________________
+		: (Match regex:C1019("(?m-si)^\\{.*\\}$";$t;1))  // json object
 			
 			$o.parameters:=JSON Parse:C1218($t)
 			
 			  //______________________________________________________
-		: ($t="[@")\
-			 & ($t="@]")  // json array
+		: (Match regex:C1019("(?m-si)^\\[.*\\]$";$t;1))  // json array
 			
+			ARRAY TEXT:C222($tTxt_values;0x0000)
 			JSON PARSE ARRAY:C1219($t;$tTxt_values)
 			$o.parameters:=New collection:C1472
 			ARRAY TO COLLECTION:C1563(This:C1470.parameters;$tTxt_values)
