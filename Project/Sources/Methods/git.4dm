@@ -37,16 +37,17 @@ If (This:C1470[""]=Null:C1517)  // Constructor
 		"workingDirectory";Null:C1517;\
 		"git";Null:C1517;\
 		"init";Formula:C1597(git ("init"));\
-		"status";Formula:C1597(git ("status"));\
 		"add";Formula:C1597(git ("add";$1));\
 		"checkout";Formula:C1597(git ("checkout";$1));\
-		"stageAll";Formula:C1597(git ("stageAll"));\
-		"unstage";Formula:C1597(git ("unstage";$1));\
 		"commit";Formula:C1597(git ("commit";New object:C1471("message";$1;"amend";Bool:C1537($2))));\
-		"execute";Formula:C1597(git ("execute";$1).result);\
 		"diff";Formula:C1597(git ("diff";New object:C1471("path";String:C10($1);"options";String:C10($2))).result);\
 		"diffTool";Formula:C1597(git ("diffTool";$1).result);\
-		"revert";Formula:C1597(git ("revert";$1).result)\
+		"execute";Formula:C1597(git ("execute";$1).result);\
+		"revert";Formula:C1597(git ("revert";$1).result);\
+		"stage";Formula:C1597(git ("stage"));\
+		"stageAll";Formula:C1597(git ("stageAll"));\
+		"status";Formula:C1597(git ("status"));\
+		"unstage";Formula:C1597(git ("unstage";$1))\
 		)
 	
 	$o.workingDirectory:=Folder:C1567(Folder:C1567(fk database folder:K87:14;*).platformPath;fk platform path:K87:2)
@@ -182,7 +183,7 @@ Else
 			
 			  //______________________________________________________
 		: ($1="diffTool")
-			
+
 			If (Not:C34($o.success))
 				
 				$o.init()
@@ -202,6 +203,7 @@ Else
 			
 			$o.changes.clear()
 			
+
 			If (Not:C34($o.success))
 				
 				$o.init()
@@ -248,9 +250,9 @@ Else
 		: ($1="add")
 			
 			If (Value type:C1509($2)=Is collection:K8:32)
-				
+
 				  //
-				
+
 			Else 
 				
 				$o.execute("add "+Char:C90(Quote:K15:44)+String:C10($2)+Char:C90(Quote:K15:44))
