@@ -1,4 +1,4 @@
-# Ignore invisible files/folders except .gitignore
+﻿# Ignore invisible files/folders except .gitignore
 .*
 !.gitignore
 
@@ -17,3 +17,6 @@ userPreferences.*/
 Preferences/
 Resources/php.ini
 Project/BuildSettings/BuildApp.xml
+
+Settings/4DPop/
+Settings/4DPop Explorer.json

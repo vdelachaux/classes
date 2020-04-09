@@ -25,6 +25,7 @@
 	"HTU": {
 		"methods": [
 			"COMPILER_HTU",
+			"HDI menu",
 			"HTU_logs",
 			"HTU_progress",
 			"HTU_svg",
@@ -57,6 +58,9 @@
 			"tips",
 			"webArea",
 			"window"
+		],
+		"classes": [
+			"menu"
 		]
 	},
 	"tests": {
