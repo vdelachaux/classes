@@ -1,0 +1,660 @@
+﻿{
+	"$4d": {
+		"version": "1",
+		"kind": "form"
+	},
+	"windowSizingX": "variable",
+	"windowSizingY": "variable",
+	"windowMinWidth": 0,
+	"windowMinHeight": 0,
+	"windowMaxWidth": 32767,
+	"windowMaxHeight": 32767,
+	"rightMargin": 20,
+	"bottomMargin": 20,
+	"events": [
+		"onLoad",
+		"onClick",
+		"onPageChange"
+	],
+	"windowTitle": "window title",
+	"destination": "detailScreen",
+	"pages": [
+		{
+			"objects": {
+				"close": {
+					"type": "button",
+					"text": "Close",
+					"top": 517,
+					"left": 692,
+					"width": 105,
+					"height": 22,
+					"events": [
+						"onClick"
+					],
+					"action": "cancel",
+					"focusable": false
+				},
+				"trace": {
+					"type": "checkbox",
+					"text": "TRACE",
+					"top": 13,
+					"left": 20,
+					"width": 76,
+					"height": 18,
+					"events": [
+						"onClick"
+					],
+					"dataSourceTypeHint": "boolean",
+					"dataSource": "Form:C1466.trace",
+					"stroke": "#ff0000",
+					"fontWeight": "normal"
+				},
+				"Rectangle": {
+					"type": "rectangle",
+					"top": 41,
+					"left": 20,
+					"width": 777,
+					"height": 1,
+					"stroke": "#808080"
+				},
+				"Rectangle7": {
+					"type": "rectangle",
+					"top": 497,
+					"left": 20,
+					"width": 777,
+					"height": 1,
+					"stroke": "#808080"
+				},
+				"next": {
+					"type": "button",
+					"text": "Next ->",
+					"top": 12,
+					"left": 697,
+					"width": 100,
+					"height": 20,
+					"events": [
+						"onClick"
+					],
+					"action": "nextPage"
+				},
+				"previous": {
+					"type": "button",
+					"text": "<- Previous",
+					"top": 12,
+					"left": 577,
+					"width": 100,
+					"height": 20,
+					"events": [
+						"onClick"
+					],
+					"action": "previousPage"
+				}
+			}
+		},
+		{
+			"objects": {
+				"Text3": {
+					"type": "text",
+					"text": ".moveHorizontally(50)",
+					"top": 287,
+					"left": 259,
+					"width": 185,
+					"height": 16,
+					"stroke": "#1e90ff"
+				},
+				"Rectangle1": {
+					"type": "rectangle",
+					"top": 308,
+					"left": 254,
+					"width": 173,
+					"height": 22,
+					"fill": "transparent",
+					"stroke": "#FFFB00"
+				},
+				"Line8": {
+					"type": "line",
+					"top": 308,
+					"left": 16,
+					"width": 422,
+					"height": 0,
+					"startPoint": "topLeft",
+					"stroke": "#1e90ff",
+					"strokeDashArray": [
+						1,
+						2
+					]
+				},
+				"Line9": {
+					"type": "line",
+					"top": 329,
+					"left": 16,
+					"width": 422,
+					"height": 0,
+					"startPoint": "topLeft",
+					"stroke": "#1e90ff",
+					"strokeDashArray": [
+						1,
+						2
+					]
+				},
+				"Line": {
+					"type": "line",
+					"top": 69,
+					"left": 21,
+					"width": 0,
+					"height": 469,
+					"startPoint": "topLeft",
+					"stroke": "#1e90ff",
+					"strokeDashArray": [
+						1,
+						2
+					]
+				},
+				"Line1": {
+					"type": "line",
+					"top": 69,
+					"left": 193,
+					"width": 0,
+					"height": 469,
+					"startPoint": "topLeft",
+					"stroke": "#1e90ff",
+					"strokeDashArray": [
+						1,
+						2
+					]
+				},
+				"Line2": {
+					"type": "line",
+					"top": 69,
+					"left": 254,
+					"width": 0,
+					"height": 469,
+					"startPoint": "topLeft",
+					"stroke": "#1e90ff",
+					"strokeDashArray": [
+						1,
+						2
+					]
+				},
+				"Line3": {
+					"type": "line",
+					"top": 69,
+					"left": 426,
+					"width": 0,
+					"height": 469,
+					"startPoint": "topLeft",
+					"stroke": "#1e90ff",
+					"strokeDashArray": [
+						1,
+						2
+					]
+				},
+				"Line4": {
+					"type": "line",
+					"top": 237,
+					"left": 16,
+					"width": 422,
+					"height": 0,
+					"startPoint": "topLeft",
+					"stroke": "#1e90ff",
+					"strokeDashArray": [
+						1,
+						2
+					]
+				},
+				"Line5": {
+					"type": "line",
+					"top": 258,
+					"left": 16,
+					"width": 422,
+					"height": 0,
+					"startPoint": "topLeft",
+					"stroke": "#1e90ff",
+					"strokeDashArray": [
+						1,
+						2
+					]
+				},
+				"Line6": {
+					"type": "line",
+					"top": 167,
+					"left": 16,
+					"width": 422,
+					"height": 0,
+					"startPoint": "topLeft",
+					"stroke": "#1e90ff",
+					"strokeDashArray": [
+						1,
+						2
+					]
+				},
+				"Line7": {
+					"type": "line",
+					"top": 189,
+					"left": 16,
+					"width": 422,
+					"height": 0,
+					"startPoint": "topLeft",
+					"stroke": "#1e90ff",
+					"strokeDashArray": [
+						1,
+						2
+					]
+				},
+				"Rectangle2": {
+					"type": "rectangle",
+					"top": 167,
+					"left": 21,
+					"width": 173,
+					"height": 22,
+					"fill": "transparent",
+					"stroke": "#000000"
+				},
+				"Button1": {
+					"type": "button",
+					"text": "Align Left",
+					"top": 74,
+					"left": 21,
+					"width": 174,
+					"height": 22,
+					"events": [
+						"onClick"
+					],
+					"focusable": false
+				},
+				"Button2": {
+					"type": "button",
+					"text": "Align right",
+					"top": 74,
+					"left": 254,
+					"width": 174,
+					"height": 22,
+					"events": [
+						"onClick"
+					],
+					"focusable": false
+				},
+				"Text": {
+					"type": "text",
+					"text": ".bestSize().enable()",
+					"top": 51,
+					"left": 26,
+					"width": 185,
+					"height": 16,
+					"stroke": "#1e90ff"
+				},
+				"Text1": {
+					"type": "text",
+					"text": ".bestSize(Align right)",
+					"top": 51,
+					"left": 259,
+					"width": 185,
+					"height": 16,
+					"stroke": "#1e90ff"
+				},
+				"Text2": {
+					"type": "text",
+					"text": ".setCoordinates(left-10;top-5;right+10;bottom+5)",
+					"top": 146,
+					"left": 26,
+					"width": 406,
+					"height": 16,
+					"stroke": "#1e90ff"
+				},
+				"Text4": {
+					"type": "text",
+					"text": ".resizeHorizontally(20)",
+					"top": 215,
+					"left": 26,
+					"width": 185,
+					"height": 16,
+					"stroke": "#1e90ff"
+				},
+				"Text5": {
+					"type": "text",
+					"text": ".resizeVertically(10)",
+					"top": 287,
+					"left": 26,
+					"width": 185,
+					"height": 16,
+					"stroke": "#1e90ff"
+				},
+				"Check Box": {
+					"type": "checkbox",
+					"text": "Login Required",
+					"top": 108,
+					"left": 21,
+					"width": 172,
+					"height": 18,
+					"events": [
+						"onClick"
+					],
+					"focusable": false,
+					"shortcutAccel": true,
+					"shortcutControl": false,
+					"shortcutShift": false,
+					"shortcutAlt": false,
+					"shortcutKey": "r"
+				},
+				"Check Box1": {
+					"type": "checkbox",
+					"text": "Close",
+					"top": 108,
+					"left": 254,
+					"width": 172,
+					"height": 18,
+					"events": [
+						"onClick"
+					],
+					"focusable": false,
+					"shortcutAccel": false,
+					"shortcutControl": false,
+					"shortcutShift": false,
+					"shortcutAlt": false,
+					"shortcutKey": ""
+				},
+				"Rectangle4": {
+					"type": "rectangle",
+					"top": 237,
+					"left": 21,
+					"width": 173,
+					"height": 22,
+					"fill": "transparent",
+					"stroke": "#008F00"
+				},
+				"Rectangle3": {
+					"type": "rectangle",
+					"top": 308,
+					"left": 21,
+					"width": 173,
+					"height": 22,
+					"fill": "transparent",
+					"stroke": "#ff0000"
+				},
+				"Text6": {
+					"type": "text",
+					"text": ".moveHorizontally(100).resizeHorizontally(-141).resizeVertically(10)",
+					"top": 357,
+					"left": 26,
+					"width": 425,
+					"height": 16,
+					"stroke": "#1e90ff"
+				},
+				"Rectangle5": {
+					"type": "rectangle",
+					"top": 379,
+					"left": 21,
+					"width": 173,
+					"height": 22,
+					"fill": "transparent",
+					"stroke": "#9437FF"
+				},
+				"Text7": {
+					"type": "text",
+					"text": ".moveVertically(10)",
+					"top": 215,
+					"left": 259,
+					"width": 185,
+					"height": 16,
+					"stroke": "#1e90ff"
+				},
+				"Rectangle6": {
+					"type": "rectangle",
+					"top": 236,
+					"left": 255,
+					"width": 173,
+					"height": 22,
+					"fill": "transparent",
+					"stroke": "#0433FF"
+				},
+				"execute": {
+					"type": "button",
+					"text": "Execute",
+					"top": 167,
+					"left": 474,
+					"width": 105,
+					"height": 22,
+					"events": [
+						"onClick"
+					],
+					"action": "",
+					"focusable": false,
+					"method": "ObjectMethods/execute.4dm"
+				},
+				"Button4": {
+					"type": "button",
+					"text": "xxx",
+					"top": 438,
+					"left": 130,
+					"width": 206,
+					"height": 22,
+					"events": [
+						"onClick"
+					],
+					"focusable": false
+				},
+				"Button5": {
+					"type": "button",
+					"text": "World",
+					"top": 438,
+					"left": 340,
+					"width": 47,
+					"height": 22,
+					"events": [
+						"onClick"
+					],
+					"focusable": false
+				},
+				"Text8": {
+					"type": "text",
+					"text": ":xliff:",
+					"top": 441,
+					"left": 21,
+					"width": 174,
+					"height": 16
+				},
+				"Text9": {
+					"type": "text",
+					"text": ".distributeHorizontally()",
+					"top": 418,
+					"left": 21,
+					"width": 425,
+					"height": 16,
+					"stroke": "#1e90ff"
+				},
+				"reset": {
+					"type": "button",
+					"text": "Reset",
+					"top": 167,
+					"left": 676,
+					"width": 105,
+					"height": 22,
+					"events": [
+						"onClick"
+					],
+					"action": "",
+					"focusable": false,
+					"method": "ObjectMethods/reset.4dm"
+				},
+				"Text10": {
+					"type": "text",
+					"text": "Form objects positionning",
+					"top": 8,
+					"left": 97,
+					"width": 466,
+					"height": 29,
+					"fontSize": 24,
+					"stroke": "#808080",
+					"textAlign": "center"
+				},
+				"Text12": {
+					"type": "text",
+					"text": "You can execute the object positioning code once or several times by clicking on the \"Execute\" button and then restore the initial positions with the \"Reset\" button.",
+					"top": 84,
+					"left": 474,
+					"width": 307,
+					"height": 77
+				}
+			},
+			"entryOrder": [
+				"Button1",
+				"Button2",
+				"Check Box",
+				"Check Box1",
+				"execute",
+				"Button4",
+				"Button5",
+				"reset"
+			]
+		},
+		{
+			"objects": {
+				"Line11": {
+					"type": "line",
+					"top": 97,
+					"left": 274,
+					"width": 0,
+					"height": 78,
+					"stroke": "#ff0000",
+					"strokeWidth": 2,
+					"startPoint": "topLeft"
+				},
+				"Line12": {
+					"type": "line",
+					"top": 175,
+					"left": 126,
+					"width": 128,
+					"height": 0,
+					"stroke": "#ff0000",
+					"strokeWidth": 2,
+					"startPoint": "topLeft"
+				},
+				"Line13": {
+					"type": "line",
+					"top": 97,
+					"left": 218,
+					"width": 56,
+					"height": 0,
+					"stroke": "#ff0000",
+					"strokeWidth": 2,
+					"startPoint": "topLeft"
+				},
+				"Line10": {
+					"type": "line",
+					"top": 107,
+					"left": 126,
+					"width": 0,
+					"height": 58,
+					"stroke": "#ff0000",
+					"strokeWidth": 2,
+					"strokeDashArray": [
+						6,
+						2
+					],
+					"startPoint": "topLeft"
+				},
+				"Input": {
+					"type": "input",
+					"left": 35,
+					"top": 88,
+					"width": 183,
+					"height": 17,
+					"dataSource": "Form:C1466.nonAssignable",
+					"enterable": true,
+					"focusable": false,
+					"contextMenu": "none",
+					"fill": "automatic"
+				},
+				"Input1": {
+					"type": "input",
+					"left": 35,
+					"top": 167,
+					"width": 183,
+					"height": 17,
+					"dataSource": ""
+				},
+				"Button7": {
+					"type": "button",
+					"text": "Get value",
+					"top": 126,
+					"left": 86,
+					"width": 82,
+					"height": 20,
+					"events": [
+						"onClick"
+					],
+					"method": "ObjectMethods/Button7.4dm",
+					"focusable": true,
+					"display": true
+				},
+				"Button6": {
+					"type": "button",
+					"text": "Set value",
+					"top": 165,
+					"left": 238,
+					"width": 80,
+					"height": 20,
+					"events": [
+						"onClick"
+					],
+					"method": "ObjectMethods/Button6.4dm",
+					"focusable": true
+				},
+				"Text13": {
+					"type": "text",
+					"text": "Get - Set value",
+					"top": 8,
+					"left": 97,
+					"width": 466,
+					"height": 29,
+					"fontSize": 24,
+					"stroke": "#808080",
+					"textAlign": "center"
+				},
+				"Text11": {
+					"type": "text",
+					"text": "You can execute the object positioning code once or several times by clicking on the \"Execute\" button and then restore the initial positions with the \"Reset\" button.",
+					"top": 84,
+					"left": 474,
+					"width": 307,
+					"height": 77
+				},
+				"Button3": {
+					"type": "button",
+					"text": "Clear",
+					"top": 211,
+					"left": 138,
+					"width": 80,
+					"height": 20,
+					"events": [
+						"onClick"
+					],
+					"method": "ObjectMethods/Button3.4dm",
+					"focusable": true
+				}
+			}
+		}
+	],
+	"method": "method.4dm",
+	"editor": {
+		"groups": {
+			"Group": [
+				"Line6",
+				"Line7",
+				"Rectangle2",
+				"Text2"
+			],
+			"Group3": [
+				"Line11",
+				"Line12",
+				"Line13",
+				"Line10",
+				"Input",
+				"Input1",
+				"Button7",
+				"Button6",
+				"Button3"
+			]
+		}
+	}
+}
