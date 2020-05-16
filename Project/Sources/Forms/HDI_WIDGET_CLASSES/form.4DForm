@@ -142,7 +142,7 @@
 					"top": 69,
 					"left": 21,
 					"width": 0,
-					"height": 469,
+					"height": 409,
 					"startPoint": "topLeft",
 					"stroke": "#1e90ff",
 					"strokeDashArray": [
@@ -155,7 +155,7 @@
 					"top": 69,
 					"left": 193,
 					"width": 0,
-					"height": 469,
+					"height": 409,
 					"startPoint": "topLeft",
 					"stroke": "#1e90ff",
 					"strokeDashArray": [
@@ -168,7 +168,7 @@
 					"top": 69,
 					"left": 254,
 					"width": 0,
-					"height": 469,
+					"height": 409,
 					"startPoint": "topLeft",
 					"stroke": "#1e90ff",
 					"strokeDashArray": [
@@ -181,7 +181,7 @@
 					"top": 69,
 					"left": 426,
 					"width": 0,
-					"height": 469,
+					"height": 409,
 					"startPoint": "topLeft",
 					"stroke": "#1e90ff",
 					"strokeDashArray": [
@@ -248,7 +248,7 @@
 					"width": 173,
 					"height": 22,
 					"fill": "transparent",
-					"stroke": "#000000"
+					"stroke": "automatic"
 				},
 				"Button1": {
 					"type": "button",
@@ -509,54 +509,10 @@
 		},
 		{
 			"objects": {
-				"Line11": {
-					"type": "line",
-					"top": 97,
-					"left": 274,
-					"width": 0,
-					"height": 78,
-					"stroke": "#ff0000",
-					"strokeWidth": 2,
-					"startPoint": "topLeft"
-				},
-				"Line12": {
-					"type": "line",
-					"top": 175,
-					"left": 126,
-					"width": 128,
-					"height": 0,
-					"stroke": "#ff0000",
-					"strokeWidth": 2,
-					"startPoint": "topLeft"
-				},
-				"Line13": {
-					"type": "line",
-					"top": 97,
-					"left": 218,
-					"width": 56,
-					"height": 0,
-					"stroke": "#ff0000",
-					"strokeWidth": 2,
-					"startPoint": "topLeft"
-				},
-				"Line10": {
-					"type": "line",
-					"top": 107,
-					"left": 126,
-					"width": 0,
-					"height": 58,
-					"stroke": "#ff0000",
-					"strokeWidth": 2,
-					"strokeDashArray": [
-						6,
-						2
-					],
-					"startPoint": "topLeft"
-				},
 				"Input": {
 					"type": "input",
-					"left": 35,
-					"top": 88,
+					"left": 97,
+					"top": 79,
 					"width": 183,
 					"height": 17,
 					"dataSource": "Form:C1466.nonAssignable",
@@ -567,37 +523,41 @@
 				},
 				"Input1": {
 					"type": "input",
-					"left": 35,
-					"top": 167,
-					"width": 183,
+					"left": 402,
+					"top": 213,
+					"width": 257,
 					"height": 17,
-					"dataSource": ""
+					"dataSource": "",
+					"events": [
+						"onAfterEdit"
+					],
+					"method": "ObjectMethods/Input1.4dm"
 				},
-				"Button7": {
+				"getValue": {
 					"type": "button",
 					"text": "Get value",
-					"top": 126,
-					"left": 86,
+					"top": 210,
+					"left": 300,
 					"width": 82,
 					"height": 20,
 					"events": [
 						"onClick"
 					],
-					"method": "ObjectMethods/Button7.4dm",
+					"method": "ObjectMethods/getValue.4dm",
 					"focusable": true,
 					"display": true
 				},
-				"Button6": {
+				"Button3": {
 					"type": "button",
 					"text": "Set value",
-					"top": 165,
-					"left": 238,
+					"top": 275,
+					"left": 300,
 					"width": 80,
 					"height": 20,
 					"events": [
 						"onClick"
 					],
-					"method": "ObjectMethods/Button6.4dm",
+					"method": "ObjectMethods/Button3.4dm",
 					"focusable": true
 				},
 				"Text13": {
@@ -613,24 +573,59 @@
 				},
 				"Text11": {
 					"type": "text",
-					"text": "You can execute the object positioning code once or several times by clicking on the \"Execute\" button and then restore the initial positions with the \"Reset\" button.",
-					"top": 84,
-					"left": 474,
-					"width": 307,
-					"height": 77
+					"text": "The input box on left is linked to the expression Form.nonAssignable. The one below is a dynamic variable.You can retrieve it's value by clicking the button \"Get value\"",
+					"top": 79,
+					"left": 300,
+					"width": 377,
+					"height": 92
 				},
-				"Button3": {
+				"celarValue": {
 					"type": "button",
 					"text": "Clear",
-					"top": 211,
-					"left": 138,
+					"top": 275,
+					"left": 402,
 					"width": 80,
 					"height": 20,
 					"events": [
 						"onClick"
 					],
-					"method": "ObjectMethods/Button3.4dm",
+					"method": "ObjectMethods/celarValue.4dm",
 					"focusable": true
+				},
+				"Text14": {
+					"type": "text",
+					"text": "Then, clear it or modify the content with the 2 above buttons",
+					"top": 250,
+					"left": 300,
+					"width": 377,
+					"height": 31
+				}
+			}
+		},
+		{
+			"objects": {
+				"Text15": {
+					"type": "text",
+					"text": "Menus",
+					"top": 8,
+					"left": 97,
+					"width": 466,
+					"height": 29,
+					"fontSize": 24,
+					"stroke": "#808080",
+					"textAlign": "center"
+				},
+				"Button": {
+					"type": "button",
+					"text": "pop menu",
+					"top": 78,
+					"left": 49,
+					"width": 115,
+					"height": 30,
+					"events": [
+						"onClick"
+					],
+					"method": "ObjectMethods/Button.4dm"
 				}
 			}
 		}
@@ -643,17 +638,6 @@
 				"Line7",
 				"Rectangle2",
 				"Text2"
-			],
-			"Group3": [
-				"Line11",
-				"Line12",
-				"Line13",
-				"Line10",
-				"Input",
-				"Input1",
-				"Button7",
-				"Button6",
-				"Button3"
 			]
 		}
 	}
