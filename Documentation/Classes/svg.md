@@ -33,7 +33,7 @@ SVG_SET_FILL_BRUSH($circle; "none")
 SVG_SET_STROKE_BRUSH($circle; "blue")
 SVG_SET_STROKE_WIDTH($circle; 4)
 	
-// Create a yellow square
+// Create a red square
 $rect:=SVG_New_rect($background; 10; 10; 100; 100)
 SVG_SET_FILL_BRUSH($rect; "red")
 SVG_SET_STROKE_BRUSH($rect; "red")
