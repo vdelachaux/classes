@@ -210,7 +210,7 @@ The class constructor also accepts an optional parameter, so you can create a sv
 |.**attachTo**(parent : Variant) → cs.svg | Adds item to parent item
 |.**push**(name : Text) → cs.svg | Keeps the dom reference into the store associated with the given name
 |.**fetch**(name : Text)→dom : Text | Retrieve a stored dom reference associated with the given name
-|.**copy**(source : Text {; attachTo}) → cs.svg |To create a copy of a svg object
+|.**clone**(source : Text {; attachTo}) → cs.svg |To create a copy of a svg object
 |.**isOfClass**(class : Text {; target }) → isOfclass : Boolean | Tests if the node belongs to a class
 |.**preview**({ keepStructure : Boolean }) | Display the SVG image & tree into the SVG Viewer if the component 4D SVG is available.
 
