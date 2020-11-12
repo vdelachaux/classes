@@ -1,15 +1,19 @@
-Class constructor
-	var $1 : Variant
+Class constructor($variable)
 	
 	This:C1470.root:=Null:C1517
 	This:C1470.autoClose:=True:C214
-	This:C1470.success:=False:C215
 	This:C1470.file:=Null:C1517
+	This:C1470.xml:=Null:C1517
+	This:C1470.success:=False:C215
 	This:C1470.errors:=New collection:C1472
 	
 	If (Count parameters:C259>=1)
 		
-		This:C1470.load($1)
+		This:C1470.load($variable)
+		
+	Else 
+		
+		This:C1470.success:=True:C214
 		
 	End if 
 	
@@ -148,48 +152,42 @@ Function parse  // Parse a variable (TEXT or BLOB)
 			//……………………………………………………………………………………………
 	End case 
 	
-/*———————————————————————————————————————————————————————————*/
-Function load  // Load a variable (TEXT or BLOB) or a file
-	var $0 : Object
-	var $1 : Variant
-	var $2 : Boolean
-	var $3 : Text
+	//———————————————————————————————————————————————————————————
+	// Load a variable (TEXT or BLOB) or a file
+Function load($source : Variant; $validate : Boolean; $schema : Text)->$this : cs:C1710.xml
 	
-	var $node : Text
-	var $countParam : Integer
+	var $root : Text
 	
 	This:C1470.close()  // Release memory
-	
-	$countParam:=Count parameters:C259
 	
 	Case of 
 			
 			//______________________________________________________
-		: ($countParam=0)
+		: (Count parameters:C259=0)
 			
 			This:C1470.success:=False:C215
 			This:C1470.errors.push(Current method name:C684+" -  Missing the target to load")
 			
 			//______________________________________________________
-		: (Value type:C1509($1)=Is text:K8:3)\
-			 | (Value type:C1509($1)=Is BLOB:K8:12)  // Parse a given variable
+		: (Value type:C1509($source)=Is text:K8:3)\
+			 | (Value type:C1509($source)=Is BLOB:K8:12)  // Parse a given variable
 			
 			Case of 
 					
 					//……………………………………………………………………………………………
-				: ($countParam=1)
+				: (Count parameters:C259=1)
 					
-					$node:=DOM Parse XML variable:C720($1)
+					$root:=DOM Parse XML variable:C720($source)
 					
 					//……………………………………………………………………………………………
-				: ($countParam=2)
+				: (Count parameters:C259=2)
 					
-					$node:=DOM Parse XML variable:C720($1; $2)
+					$root:=DOM Parse XML variable:C720($source; $validate)
 					
 					//……………………………………………………………………………………………
 				Else 
 					
-					$node:=DOM Parse XML variable:C720($1; $2; $3)
+					$root:=DOM Parse XML variable:C720($source; $validate; $schema)
 					
 					//……………………………………………………………………………………………
 			End case 
@@ -198,41 +196,41 @@ Function load  // Load a variable (TEXT or BLOB) or a file
 			
 			If (This:C1470.success)
 				
-				This:C1470.root:=$node
+				This:C1470.root:=$root
 				
 			Else 
 				
-				This:C1470.errors.push(Current method name:C684+" -  Failed to parse the "+Choose:C955(Value type:C1509($1)=Is text:K8:3; "text"; "blob")+" variable")
+				This:C1470.errors.push(Current method name:C684+" -  Failed to parse the "+Choose:C955(Value type:C1509($source)=Is text:K8:3; "text"; "blob")+" variable")
 				
 			End if 
 			
 			//______________________________________________________
-		: (Value type:C1509($1)=Is object:K8:27)  // File to load
+		: (Value type:C1509($source)=Is object:K8:27)  // File to load
 			
-			This:C1470.success:=OB Instance of:C1731($1; 4D:C1709.File)
+			This:C1470.success:=OB Instance of:C1731($source; 4D:C1709.File)
 			
 			If (This:C1470.success)
 				
-				This:C1470.success:=Bool:C1537($1.isFile) & Bool:C1537($1.exists)
+				This:C1470.success:=Bool:C1537($source.isFile) & Bool:C1537($source.exists)
 				
 				If (This:C1470.success)
 					
 					Case of 
 							
 							//……………………………………………………………………………………………
-						: ($countParam=1)
+						: (Count parameters:C259=1)
 							
-							$node:=DOM Parse XML source:C719($1.platformPath)
+							$root:=DOM Parse XML source:C719($source.platformPath)
 							
 							//……………………………………………………………………………………………
-						: ($countParam=2)
+						: (Count parameters:C259=2)
 							
-							$node:=DOM Parse XML source:C719($1.platformPath; $2)
+							$root:=DOM Parse XML source:C719($source.platformPath; $validate)
 							
 							//……………………………………………………………………………………………
 						Else 
 							
-							$node:=DOM Parse XML source:C719($1.platformPath; $2; $3)
+							$root:=DOM Parse XML source:C719($source.platformPath; $validate; $schema)
 							
 							//……………………………………………………………………………………………
 					End case 
@@ -241,14 +239,14 @@ Function load  // Load a variable (TEXT or BLOB) or a file
 					
 					If (This:C1470.success)
 						
-						This:C1470.root:=$node
-						This:C1470.file:=$1
+						This:C1470.root:=$root
+						This:C1470.file:=$source
 						
 					End if 
 					
 				Else 
 					
-					This:C1470.errors.push(Current method name:C684+" -  File not found: "+String:C10($1.platformPath))
+					This:C1470.errors.push(Current method name:C684+" -  File not found: "+String:C10($source.platformPath))
 					
 				End if 
 				
@@ -261,12 +259,12 @@ Function load  // Load a variable (TEXT or BLOB) or a file
 			//______________________________________________________
 		Else 
 			
-			This:C1470.errors.push(Current method name:C684+" -  Unmanaged type: "+String:C10(Value type:C1509($1)))
+			This:C1470.errors.push(Current method name:C684+" -  Unmanaged type: "+String:C10(Value type:C1509($source)))
 			
 			//________________________________________
 	End case 
 	
-	$0:=This:C1470
+	$this:=This:C1470
 	
 /*———————————————————————————————————————————————————————————*/
 Function save
@@ -321,20 +319,20 @@ Function save
 		
 		If (Count parameters:C259>=1)
 			
-			This:C1470.__close($close)
+			This:C1470._close($close)
 			
 		Else 
 			
-			This:C1470.__close()
+			This:C1470._close()
 			
 		End if 
 	End if 
 	
 	$0:=This:C1470
 	
-/*———————————————————————————————————————————————————————————*/
-Function close  // Close the XML tree
-	var $0 : Object
+	//———————————————————————————————————————————————————————————
+	// Close the XML tree
+Function close->$this : cs:C1710.xml
 	
 	This:C1470.success:=(This:C1470.root#Null:C1517)
 	
@@ -346,7 +344,7 @@ Function close  // Close the XML tree
 		
 	End if 
 	
-	$0:=This:C1470
+	$this:=This:C1470
 	
 /*———————————————————————————————————————————————————————————*/
 Function create
@@ -355,11 +353,9 @@ Function create
 	var $2 : Variant
 	var $3 : Variant
 	
-	This:C1470.success:=(Count parameters:C259>=1)
-	
-	If (This:C1470.success)
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
 		
-		If (This:C1470.__isReference($1))
+		If (This:C1470.isReference($1))
 			
 			$0:=DOM Create XML element:C865($1; $2)
 			
@@ -382,31 +378,41 @@ Function create
 		
 		This:C1470.success:=Bool:C1537(OK)
 		
-	Else 
-		
-		This:C1470.errors.push(Current method name:C684+" -  Missing parameters")
-		
 	End if 
 	
-/*———————————————————————————————————————————————————————————*/
-Function getText  // Return the  XML tree as text
-	var $0 : Text
-	var $1 : Boolean
+	//———————————————————————————————————————————————————————————
+	// Makes a copy of the given object
+Function clone($source : Text; $target : Text)->$node : Text
 	
-	var $t : Text
+	If (This:C1470._requiredParams(Count parameters:C259; 2))
+		
+		$node:=DOM Append XML element:C1082($target; $source)
+		
+		If (OK=1)
+			
+			This:C1470.success:=Bool:C1537(OK)
+			
+		End if 
+	End if 
 	
-	DOM EXPORT TO VAR:C863(This:C1470.root; $t)
+	//———————————————————————————————————————————————————————————/
+	// Returns the SVG tree as text
+Function content($keepStructure : Boolean)->$xml : Text
+	
+	DOM EXPORT TO VAR:C863(This:C1470.root; $xml)
 	This:C1470.success:=Bool:C1537(OK)
 	
 	If (This:C1470.success)
 		
+		This:C1470.xml:=$xml
+		
 		If (Count parameters:C259>=1)
 			
-			This:C1470.__close($1)
+			This:C1470._close($keepStructure)
 			
 		Else 
 			
-			This:C1470.__close()
+			This:C1470._close()
 			
 		End if 
 		
@@ -415,8 +421,6 @@ Function getText  // Return the  XML tree as text
 		This:C1470.errors.push(Current method name:C684+" -  Failed to export XML to text.")
 		
 	End if 
-	
-	$0:=$t
 	
 /*———————————————————————————————————————————————————————————*/
 Function getContent  // Return the  XML tree as BLOB
@@ -432,11 +436,11 @@ Function getContent  // Return the  XML tree as BLOB
 		
 		If (Count parameters:C259>=1)
 			
-			This:C1470.__close($1)
+			This:C1470._close($1)
 			
 		Else 
 			
-			This:C1470.__close()
+			This:C1470._close()
 			
 		End if 
 		
@@ -463,114 +467,147 @@ Function toObject
 		
 	End if 
 	
-/*———————————————————————————————————————————————————————————*/
-Function findById
-	var $0 : Text
-	var $1 : Text
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Search for an element by its id
+Function findById($id : Text)->$reference : Text
 	
-	This:C1470.success:=(Count parameters:C259>=1)
-	
-	If (This:C1470.success)
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
 		
-		$0:=DOM Find XML element by ID:C1010(This:C1470.root; $1)
+		$reference:=DOM Find XML element by ID:C1010(This:C1470.root; $id)
 		This:C1470.success:=Bool:C1537(OK)
 		
 	Else 
 		
-		This:C1470.errors.push(Current method name:C684+" -  Missing ID parameter")
+		This:C1470.errors.push(Current method name:C684+" - Missing id parameter")
 		
 	End if 
 	
-/*———————————————————————————————————————————————————————————*/
-Function findByXPath
-	var $0 : Text
-	var $1 : Text
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Looks  for the 1st element corresponding to an XPath & returns its reference if success.
+Function findByXPath($xpath : Text; $node : Text)->$reference : Text
 	
-	This:C1470.success:=(Count parameters:C259>=1)
-	
-	If (This:C1470.success)
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
 		
-		$0:=DOM Find XML element:C864(This:C1470.root; $1)
+		If (Count parameters:C259>=2)
+			
+			$reference:=DOM Find XML element:C864($node; $xpath)
+			
+		Else 
+			
+			// Search from the root
+			$reference:=DOM Find XML element:C864(This:C1470.root; $xpath)
+			
+		End if 
+		
 		This:C1470.success:=Bool:C1537(OK)
 		
-	Else 
-		
-		This:C1470.errors.push(Current method name:C684+" -  Missing path parameter")
-		
 	End if 
 	
-/*———————————————————————————————————————————————————————————*/
-Function findByName
-	var $0 : Collection
-	var $1 : Text
-	var $2 : Text
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Searches for one or more elements corresponding to an XPath & returns a references collection if success.
+Function find($node : Text; $xpath : Text)->$references : Collection
 	
-	This:C1470.success:=(Count parameters:C259>=1)
+	$references:=New collection:C1472()
+	ARRAY TEXT:C222($nodes; 0x0000)
 	
-	If (This:C1470.success)
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
+		
+		If (This:C1470.isReference($node))\
+			 & (Count parameters:C259>=2)
+			
+			$nodes{0}:=DOM Find XML element:C864($node; $xpath; $nodes)
+			
+		Else 
+			
+			// Start at the root, query string is the 1st parameter
+			$nodes{0}:=DOM Find XML element:C864(This:C1470.root; $node; $nodes)
+			
+		End if 
+		
+		This:C1470.success:=Bool:C1537(OK)
+		
+		If (This:C1470.success)
+			
+			ARRAY TO COLLECTION:C1563($references; $nodes)
+			
+		End if 
+	End if 
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Search for elements by there name & returns a references collection if success.
+Function findByName($target : Text; $name : Text)->$references : Collection
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
 		
 		ARRAY TEXT:C222($nodes; 0x0000)
 		
 		If (Count parameters:C259>=2)
 			
-			If (This:C1470.__isReference($1))
+			If (This:C1470.isReference($target))
 				
-				$nodes{0}:=DOM Find XML element:C864($1; $2; $nodes)
+				If (This:C1470._requiredParams(Count parameters:C259; 2))
+					
+					$nodes{0}:=DOM Find XML element:C864($target; $name; $nodes)
+					This:C1470.success:=Bool:C1537(OK)
+				Else 
+					
+					This:C1470.success:=False:C215
+					This:C1470.errors.push(Current method name:C684+" - Missing name parameter")
+					
+				End if 
 				
 			Else 
 				
-				$nodes{0}:=DOM Find XML element:C864(This:C1470.root; "//"+$1; $nodes)
-				
+				$nodes{0}:=DOM Find XML element:C864(This:C1470.root; "//"+$target; $nodes)
+				This:C1470.success:=Bool:C1537(OK)
 			End if 
 			
 		Else 
 			
-			$nodes{0}:=DOM Find XML element:C864(This:C1470.root; "//"+$1; $nodes)
+			$nodes{0}:=DOM Find XML element:C864(This:C1470.root; "//"+$target; $nodes)
+			This:C1470.success:=Bool:C1537(OK)
+		End if 
+		
+		If (This:C1470.success)
+			
+			$references:=New collection:C1472
+			ARRAY TO COLLECTION:C1563($references; $nodes)
 			
 		End if 
 		
-		This:C1470.success:=Bool:C1537(OK)
-		$0:=New collection:C1472
-		ARRAY TO COLLECTION:C1563($0; $nodes)
-		
 	Else 
 		
-		This:C1470.errors.push(Current method name:C684+" -  Missing parameters")
+		This:C1470.success:=False:C215
+		This:C1470.errors.push(Current method name:C684+" - Missing name parameter")
 		
 	End if 
 	
-/*———————————————————————————————————————————————————————————*/
-Function findByAttribute
-	var $0 : Collection
-	var $1 : Text
-	var $2 : Text
-	var $3 : Text
-	var $4 : Text
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Search for elements by there attribute
+Function findByAttribute($target : Text; $name : Text; $value : Text; $valor)->$references : Collection
 	
-	This:C1470.success:=(Count parameters:C259>=1)
-	
-	If (This:C1470.success)
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
 		
 		ARRAY TEXT:C222($nodes; 0x0000)
 		
-		If (This:C1470.__isReference($1))
+		If (This:C1470.isReference($1))
 			
 			Case of 
 					
 					//______________________________________________________
-				: (Count parameters:C259=2)  // Elements with the attribute $2
+				: (Count parameters:C259=2)  // Elements with the attribute $name
 					
-					$nodes{0}:=DOM Find XML element:C864($1; "//@"+$2; $nodes)
-					
-					//______________________________________________________
-				: (Count parameters:C259=3)  // Elements with the attribute $2 equal to $3
-					
-					$nodes{0}:=DOM Find XML element:C864($1; "//[@"+$2+"=\""+$3+"\"]"; $nodes)
+					$nodes{0}:=DOM Find XML element:C864($target; "//@"+$name; $nodes)
 					
 					//______________________________________________________
-				: (Count parameters:C259>=4)  // Elements $2 with the attribute $3 equal to $4
+				: (Count parameters:C259=3)  // Elements with the attribute $name equal to $value
 					
-					$nodes{0}:=DOM Find XML element:C864($1; "//"+$2+"[@"+$3+"=\""+$4+"\"]"; $nodes)
+					$nodes{0}:=DOM Find XML element:C864($target; "//[@"+$name+"=\""+$value+"\"]"; $nodes)
+					
+					//______________________________________________________
+				: (Count parameters:C259>=4)  // Elements $name with the attribute $value equal to $valor
+					
+					$nodes{0}:=DOM Find XML element:C864($target; "//"+$name+"[@"+$value+"=\""+$valor+"\"]"; $nodes)
 					
 					//______________________________________________________
 				Else 
@@ -587,17 +624,17 @@ Function findByAttribute
 					//______________________________________________________
 				: (Count parameters:C259=1)  // Elements with the attribute $1
 					
-					$nodes{0}:=DOM Find XML element:C864(This:C1470.root; "//@"+$1; $nodes)
+					$nodes{0}:=DOM Find XML element:C864(This:C1470.root; "//@"+$target; $nodes)
 					
 					//______________________________________________________
-				: (Count parameters:C259=2)  // Elements with the attribute $1 equal to $2
+				: (Count parameters:C259=2)  // Elements with the attribute $target equal to $name
 					
-					$nodes{0}:=DOM Find XML element:C864(This:C1470.root; "//*[@"+$1+"=\""+$2+"\"]"; $nodes)
+					$nodes{0}:=DOM Find XML element:C864(This:C1470.root; "//*[@"+$target+"=\""+$name+"\"]"; $nodes)
 					
 					//______________________________________________________
-				: (Count parameters:C259>=3)  // Elements $2 with the attribute $3 equal to $4
+				: (Count parameters:C259>=3)  // Elements $name with the attribute $name equal to $value
 					
-					$nodes{0}:=DOM Find XML element:C864(This:C1470.root; "//"+$1+"[@"+$2+"=\""+$3+"\"]"; $nodes)
+					$nodes{0}:=DOM Find XML element:C864(This:C1470.root; "//"+$target+"[@"+$name+"=\""+$value+"\"]"; $nodes)
 					
 					//______________________________________________________
 				Else 
@@ -609,527 +646,665 @@ Function findByAttribute
 		End if 
 		
 		This:C1470.success:=Bool:C1537(OK)
-		$0:=New collection:C1472
-		ARRAY TO COLLECTION:C1563($0; $nodes)
 		
-	Else 
-		
-		This:C1470.errors.push(Current method name:C684+" -  Missing parameters")
-		
+		If (This:C1470.success)
+			
+			$references:=New collection:C1472
+			ARRAY TO COLLECTION:C1563($references; $nodes)
+			
+		End if 
 	End if 
 	
-/*———————————————————————————————————————————————————————————*/
-Function findOrCreate
-	var $0 : Text
-	var $1 : Text
-	var $2 : Text
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Search for an element by its name and create it if it is not found
+Function findOrCreate($target : Text; $value : Text)->$reference : Text
 	
 	var $c : Collection
 	
-	If (This:C1470.__isReference($1))
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
 		
-		$c:=This:C1470.findByName($1; $2)
-		
-		If (This:C1470.success)
+		If (This:C1470.isReference($target))
 			
-			$0:=$c[0]
-			
-		Else 
-			
-			// Create
-			$0:=DOM Create XML element:C865($1; $2)
-			
-		End if 
-		
-	Else 
-		
-		$c:=This:C1470.findByName($1)
-		
-		If (This:C1470.success)
-			
-			$0:=$c[0]
-			
-		Else 
-			
-			// Create
-			$0:=DOM Create XML element:C865(This:C1470.root; $1)
-			
-		End if 
-	End if 
-	
-	This:C1470.success:=Bool:C1537(OK)
-	
-/*———————————————————————————————————————————————————————————*/
-Function parent
-	var $0 : Text
-	var $1 : Text
-	
-	This:C1470.success:=This:C1470.__isReference($1)
-	
-	If (This:C1470.success)
-		
-		$0:=DOM Get parent XML element:C923($1)
-		
-	Else 
-		
-		This:C1470.errors.push(Current method name:C684+" -  Invalid XML element reference")
-		
-	End if 
-	
-/*———————————————————————————————————————————————————————————*/
-Function childrens  // Returns the childs of a node
-	var $0 : Collection
-	var $1 : Text
-	
-	var $i : Integer
-	
-	$0:=New collection:C1472
-	
-	ARRAY LONGINT:C221($types; 0x0000)
-	ARRAY TEXT:C222($nodes; 0x0000)
-	
-	If (Count parameters:C259>=1)
-		
-		This:C1470.success:=This:C1470.__isReference($1)
-		
-		If (This:C1470.success)
-			
-			DOM GET XML CHILD NODES:C1081($1; $types; $nodes)
-			
-		Else 
-			
-			This:C1470.errors.push(Current method name:C684+" -  Invalid XML element reference")
-			
-		End if 
-		
-	Else 
-		
-		DOM GET XML CHILD NODES:C1081(This:C1470.root; $types; $nodes)
-		
-	End if 
-	
-	For ($i; 1; Size of array:C274($types); 1)
-		
-		If ($types{$i}=XML ELEMENT:K45:20)
-			
-			$0.push($nodes{$i})
-			
-		End if 
-	End for 
-	
-/*———————————————————————————————————————————————————————————*/
-Function descendants  // Returns the descendants of a node
-	var $0 : Collection
-	var $1 : Text
-	
-	var $i : Integer
-	
-	$0:=New collection:C1472
-	
-	ARRAY LONGINT:C221($types; 0x0000)
-	ARRAY TEXT:C222($nodes; 0x0000)
-	
-	If (Count parameters:C259>=1)
-		
-		This:C1470.success:=This:C1470.__isReference($1)
-		
-		If (This:C1470.success)
-			
-			DOM GET XML CHILD NODES:C1081($1; $types; $nodes)
-			
-		Else 
-			
-			This:C1470.errors.push(Current method name:C684+" -  Invalid XML element reference")
-			
-		End if 
-		
-	Else 
-		
-		DOM GET XML CHILD NODES:C1081(This:C1470.root; $types; $nodes)
-		
-	End if 
-	
-	For ($i; 1; Size of array:C274($types); 1)
-		
-		If ($types{$i}=XML ELEMENT:K45:20)
-			
-			$0.push($nodes{$i})
-			$0.combine(This:C1470.descendants($nodes{$i}))
-			
-		End if 
-	End for 
-	
-/*———————————————————————————————————————————————————————————*/
-Function nextSibling
-	var $0; $1 : Text
-	
-	$0:=DOM Get next sibling XML element:C724($1)
-	
-/*———————————————————————————————————————————————————————————*/
-Function previousSibling
-	var $0; $1 : Text
-	
-	$0:=DOM Get previous sibling XML element:C924($1)
-	
-/*———————————————————————————————————————————————————————————*/
-Function getName
-	var $0 : Text
-	var $1 : Text
-	
-	This:C1470.success:=(Count parameters:C259>=1)
-	
-	If (This:C1470.success)
-		
-		This:C1470.success:=This:C1470.__isReference($1)
-		
-		If (This:C1470.success)
-			
-			DOM GET XML ELEMENT NAME:C730($1; $0)
-			This:C1470.success:=Bool:C1537(OK)
-			
-		Else 
-			
-			This:C1470.errors.push(Current method name:C684+" -  Invalid XML element reference")
-			
-		End if 
-	End if 
-	
-/*———————————————————————————————————————————————————————————*/
-Function setName
-	var $1 : Text
-	var $2 : Text
-	
-	This:C1470.success:=(Count parameters:C259>=2)
-	
-	If (This:C1470.success)
-		
-		This:C1470.success:=This:C1470.__isReference($1)
-		
-		If (This:C1470.success)
-			
-			DOM SET XML ELEMENT NAME:C867($1; $2)
-			This:C1470.success:=Bool:C1537(OK)
-			
-		Else 
-			
-			This:C1470.errors.push(Current method name:C684+" -  Invalid XML element reference")
-			
-		End if 
-	End if 
-	
-/*———————————————————————————————————————————————————————————*/
-Function remove
-	var $1 : Text
-	
-	This:C1470.success:=(Count parameters:C259>=1)
-	
-	If (This:C1470.success)
-		
-		This:C1470.success:=This:C1470.__isReference($1)
-		
-		If (This:C1470.success)
-			
-			DOM REMOVE XML ELEMENT:C869($1)
-			This:C1470.success:=Bool:C1537(OK)
-			
-		Else 
-			
-			This:C1470.errors.push(Current method name:C684+" -  Invalid XML element reference")
-			
-		End if 
-	End if 
-	
-/*———————————————————————————————————————————————————————————*/
-Function getValue
-	var $0 : Variant
-	var $1 : Text
-	
-	var $tCDATA; $value : Text
-	
-	This:C1470.success:=(Count parameters:C259>=1)
-	
-	If (This:C1470.success)
-		
-		This:C1470.success:=This:C1470.__isReference($1)
-		
-		If (This:C1470.success)
-			
-			DOM GET XML ELEMENT VALUE:C731($1; $value; $tCDATA)
-			This:C1470.success:=Bool:C1537(OK)
-			
-			If (This:C1470.success)
+			If (This:C1470._requiredParams(Count parameters:C259; 2))
 				
-				If (Length:C16($value)=0)
+				$c:=This:C1470.findByName($target; $value)
+				
+				If (This:C1470.success)
 					
-					// Try CDATA
-					$0:=This:C1470.__convert($tCDATA)
+					$reference:=$c[0]
 					
 				Else 
 					
-					$0:=This:C1470.__convert($value)
+					// Create
+					$reference:=DOM Create XML element:C865($target; $value)
 					
 				End if 
 			End if 
 			
 		Else 
 			
-			This:C1470.errors.push(Current method name:C684+" -  Invalid XML element reference")
+			$c:=This:C1470.findByName($target)
+			
+			If (This:C1470.success)
+				
+				$reference:=$c[0]
+				
+			Else 
+				
+				// Create
+				$reference:=DOM Create XML element:C865(This:C1470.root; $target)
+				
+			End if 
+		End if 
+		
+		This:C1470.success:=Bool:C1537(OK)
+		
+	End if 
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Returns a reference to the parent of a node
+	// If a name is passed, goes up in the hierarchy to find the named element
+Function parent($node : Text; $name : Text)->$reference : Text
+	var $elementName : Text
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
+		
+		If (This:C1470._requiredRef($node))
+			
+			$reference:=DOM Get parent XML element:C923($node; $elementName)
+			
+			This:C1470.success:=Bool:C1537(OK)
+			
+			If (This:C1470.success)
+				
+				If (Count parameters:C259>=2)
+					
+					If ($elementName#$name)
+						
+						Repeat 
+							
+							$reference:=DOM Get parent XML element:C923($reference; $elementName)
+							
+						Until (OK=0)\
+							 | ($elementName=$name)
+						
+						This:C1470.success:=($elementName=$name)
+						
+					End if 
+				End if 
+			End if 
+		End if 
+	End if 
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Returns a reference to the first “child”
+	// If the node's reference isn't passed, return the first child of the root
+	// If a name is passed, looks for the first child with that name
+Function firstChild($node : Text; $name : Text)->$reference : Text
+	var $elementName : Text
+	
+	If (Count parameters:C259>=1)
+		
+		If (This:C1470._requiredRef($node))
+			
+			$reference:=DOM Get first child XML element:C723($node; $elementName)
+			This:C1470.success:=Bool:C1537(OK)
+			
+			If (This:C1470.success)
+				
+				If (Count parameters:C259>=2)
+					
+					If ($elementName#$name)
+						
+						Repeat 
+							
+							$reference:=DOM Get next sibling XML element:C724($reference; $elementName)
+							
+						Until (OK=0)\
+							 | ($elementName=$name)
+						
+						This:C1470.success:=($elementName=$name)
+						
+					End if 
+				End if 
+			End if 
+		End if 
+		
+	Else 
+		
+		$reference:=DOM Get first child XML element:C723(This:C1470.root)
+		This:C1470.success:=Bool:C1537(OK)
+		
+	End if 
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Returns a reference to the last “child”
+	// If the node's reference isn't passed, return the first child of the root
+	// If a name is passed, looks for the last child with that name
+Function lastChild($node : Text; $name : Text)->$reference : Text
+	var $elementName : Text
+	
+	If (Count parameters:C259>=1)
+		
+		If (This:C1470._requiredRef($1))
+			
+			$reference:=DOM Get last child XML element:C925($node; $elementName)
+			This:C1470.success:=Bool:C1537(OK)
+			
+			If (This:C1470.success)
+				
+				If (Count parameters:C259>=2)
+					
+					If ($elementName#$name)
+						
+						Repeat 
+							
+							$reference:=DOM Get previous sibling XML element:C924($reference; $elementName)
+							
+						Until (OK=0)\
+							 | ($elementName=$name)
+						
+						This:C1470.success:=($elementName=$name)
+						
+					End if 
+				End if 
+			End if 
+		End if 
+		
+	Else 
+		
+		$reference:=DOM Get last child XML element:C925(This:C1470.root)
+		This:C1470.success:=Bool:C1537(OK)
+		
+	End if 
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Returns the list of the childs' references of a node or root if ref is omitted
+Function childrens($node : Text)->$childs : Collection
+	var $i : Integer
+	
+	$childs:=New collection:C1472
+	
+	ARRAY LONGINT:C221($types; 0x0000)
+	ARRAY TEXT:C222($nodes; 0x0000)
+	
+	If (Count parameters:C259>=1)
+		
+		If (This:C1470._requiredRef($node))
+			
+			DOM GET XML CHILD NODES:C1081($node; $types; $nodes)
+			
+		End if 
+		
+	Else 
+		
+		DOM GET XML CHILD NODES:C1081(This:C1470.root; $types; $nodes)
+		
+	End if 
+	
+	For ($i; 1; Size of array:C274($types); 1)
+		
+		If ($types{$i}=XML ELEMENT:K45:20)
+			
+			$childs.push($nodes{$i})
+			
+		End if 
+	End for 
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Returns the list of the descendant' references of a node or root if ref is omitted
+Function descendants($node : Text)->$descendants : Collection
+	var $i : Integer
+	
+	$descendants:=New collection:C1472
+	
+	ARRAY LONGINT:C221($types; 0x0000)
+	ARRAY TEXT:C222($nodes; 0x0000)
+	
+	If (Count parameters:C259>=1)
+		
+		If (This:C1470._requiredRef($node))
+			
+			DOM GET XML CHILD NODES:C1081($node; $types; $nodes)
+			
+		End if 
+		
+	Else 
+		
+		DOM GET XML CHILD NODES:C1081(This:C1470.root; $types; $nodes)
+		
+	End if 
+	
+	For ($i; 1; Size of array:C274($types); 1)
+		
+		If ($types{$i}=XML ELEMENT:K45:20)
+			
+			$descendants.push($nodes{$i})
+			$descendants.combine(This:C1470.descendants($nodes{$i}))
+			
+		End if 
+	End for 
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Returns a reference to the next “sibling”
+	// If a name is passed, looks for the first sibling with that name
+Function nextSibling($node : Text; $name : Text)->$reference : Text
+	var $elementName : Text
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
+		
+		If (This:C1470._requiredRef($node))
+			
+			$reference:=DOM Get next sibling XML element:C724($node; $elementName)
+			This:C1470.success:=Bool:C1537(OK)
+			
+			If (This:C1470.success)
+				
+				If (Count parameters:C259>=2)
+					
+					If ($elementName#$name)
+						
+						Repeat 
+							
+							$reference:=DOM Get next sibling XML element:C724($reference; $elementName)
+							
+						Until (OK=0)\
+							 | ($elementName=$name)
+						
+						This:C1470.success:=($elementName=$name)
+						
+					End if 
+				End if 
+			End if 
+		End if 
+	End if 
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Returns a reference to the previous “sibling”
+	// If a name is passed, looks for the first sibling with that name
+Function previousSibling($node : Text; $name : Text)->$reference : Text
+	var $elementName : Text
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
+		
+		If (This:C1470._requiredRef($node))
+			
+			$reference:=DOM Get previous sibling XML element:C924($node; $elementName)
+			This:C1470.success:=Bool:C1537(OK)
+			
+			If (This:C1470.success)
+				
+				If (Count parameters:C259>=2)
+					
+					If ($elementName#$name)
+						
+						Repeat 
+							
+							$reference:=DOM Get previous sibling XML element:C924($reference; $elementName)
+							
+						Until (OK=0)\
+							 | ($elementName=$name)
+						
+						This:C1470.success:=($elementName=$name)
+						
+					End if 
+				End if 
+			End if 
+		End if 
+	End if 
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Returns the name of the element set by $node
+Function getName($node : Text)->$name : Text
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
+		
+		If (This:C1470._requiredRef($node))
+			
+			DOM GET XML ELEMENT NAME:C730($node; $name)
+			This:C1470.success:=Bool:C1537(OK)
 			
 		End if 
 	End if 
 	
-/*———————————————————————————————————————————————————————————*/
-Function getAttribute  // Returns a node attribute value if exists
-	var $0 : Variant
-	var $1 : Text
-	var $2 : Text
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Modifies the name of the element set by $node
+Function setName($node : Text; $name : Text)
 	
+	If (This:C1470._requiredParams(Count parameters:C259; 2))
+		
+		If (This:C1470._requiredRef($node))
+			
+			DOM SET XML ELEMENT NAME:C867($node; $name)
+			This:C1470.success:=Bool:C1537(OK)
+			
+		End if 
+	End if 
+	
+	var $0 : Object
+	$0:=This:C1470
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Removes the element set by $node
+Function remove($node : Text)
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
+		
+		If (This:C1470._requiredRef($node))
+			
+			DOM REMOVE XML ELEMENT:C869($node)
+			This:C1470.success:=Bool:C1537(OK)
+			
+		End if 
+	End if 
+	
+	var $0 : Object
+	$0:=This:C1470
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Returns the value of the XML element designated by $node
+Function getValue($node : Text)->$value : Variant
+	var $CDATA; $elementValue : Text
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
+		
+		If (This:C1470._requiredRef($node))
+			
+			DOM GET XML ELEMENT VALUE:C731($node; $elementValue; $CDATA)
+			This:C1470.success:=Bool:C1537(OK)
+			
+			If (This:C1470.success)
+				
+				If (Length:C16($elementValue)=0)
+					
+					// Try CDATA
+					$value:=This:C1470._convert($CDATA)
+					
+				Else 
+					
+					$value:=This:C1470._convert($elementValue)
+					
+				End if 
+			End if 
+		End if 
+	End if 
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Returns one node attribute value if exists
+Function getAttribute($node : Text; $attribute : Text)->$value
 	var $o : Object
 	
-	This:C1470.success:=(Count parameters:C259=2)
-	
-	If (This:C1470.success)
+	If (This:C1470._requiredParams(Count parameters:C259; 2))
 		
-		$o:=OB Entries:C1720(This:C1470.getAttributes($1)).query("key=:1"; $2).pop()
+		$o:=OB Entries:C1720(This:C1470.getAttributes($node)).query("key = :1"; $attribute).pop()
 		This:C1470.success:=($o#Null:C1517)
 		
 		If (This:C1470.success)
 			
-			$0:=$o.value
+			$value:=$o.value
 			
 		Else 
 			
-			This:C1470.errors.push(Current method name:C684+" -  Attribute \""+$1+"\" not found")
+			This:C1470.errors.push(Current method name:C684+" -  Attribute \""+$attribute+"\" not found")
 			
 		End if 
-		
-	Else 
-		
-		This:C1470.errors.push(Current method name:C684+" -  Missing parameters")
-		
 	End if 
 	
-/*———————————————————————————————————————————————————————————*/
-Function getAttributes  // Returns a node attributes as object
-	var $0 : Object
-	var $1 : Text
-	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Returns a node attributes as object
+Function getAttributes($node : Text)->$attributes : Object
 	var $key; $t; $value : Text
 	var $i : Integer
 	
-	This:C1470.success:=(Count parameters:C259=1)
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
+		
+		If (This:C1470._requiredRef($node))
+			
+			$attributes:=New object:C1471
+			
+			GET SYSTEM FORMAT:C994(Decimal separator:K60:1; $t)
+			
+			For ($i; 1; DOM Count XML attributes:C727($node); 1)
+				
+				DOM GET XML ATTRIBUTE BY INDEX:C729($node; $i; $key; $value)
+				
+				$attributes[$key]:=This:C1470._convert($value)
+				
+			End for 
+		End if 
+	End if 
 	
-	If (This:C1470.success)
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Returns a node attributes as collection
+Function getAttributesCollection($node : Text)->$attributes : Collection
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
 		
-		$0:=New object:C1471
-		
-		GET SYSTEM FORMAT:C994(Decimal separator:K60:1; $t)
-		
-		For ($i; 1; DOM Count XML attributes:C727($1); 1)
-			
-			DOM GET XML ATTRIBUTE BY INDEX:C729($1; $i; $key; $value)
-			
-			$0[$key]:=This:C1470.__convert($value)
-			
-		End for 
-		
-	Else 
-		
-		This:C1470.errors.push(Current method name:C684+" -  Missing node reference")
+		$attributes:=OB Entries:C1720(This:C1470.getAttributes($node))
 		
 	End if 
 	
-/*———————————————————————————————————————————————————————————*/
-Function getAttributesCollection  // Returns a node attributes as collection
-	var $0 : Collection
-	var $1 : Text
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Set a node attribute
+Function setAttribute($node : Text; $attribute : Text; $value)
 	
-	This:C1470.success:=(Count parameters:C259=1)
-	
-	If (This:C1470.success)
+	If (This:C1470._requiredParams(Count parameters:C259; 3))
 		
-		$0:=OB Entries:C1720(This:C1470.getAttributes($1))
-		
-	Else 
-		
-		This:C1470.errors.push(Current method name:C684+" -  Missing node reference")
-		
+		If (This:C1470._requiredRef($node))
+			
+			DOM SET XML ATTRIBUTE:C866($node; $attribute; $value)
+			This:C1470.success:=Bool:C1537(OK)
+			
+		End if 
 	End if 
 	
-/*———————————————————————————————————————————————————————————*/
-Function setAttribute  // Set a node attribute
 	var $0 : Object
-	var $1 : Text
-	var $2 : Text
-	var $3 : Variant
+	$0:=This:C1470
 	
-	This:C1470.success:=(Count parameters:C259=3)
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Set a node attributes from an object or a collection (key/value pairs)
+Function setAttributes($node : Text; $attribute; $value)
 	
-	If (This:C1470.success)
+	If (This:C1470._requiredParams(Count parameters:C259; 2))
 		
-		DOM SET XML ATTRIBUTE:C866($1; $2; $3)
+		If (This:C1470._requiredRef($node))
+			
+			Case of 
+					
+					//______________________________________________________
+				: (Value type:C1509($attribute)=Is text:K8:3)
+					
+					If (This:C1470._requiredParams(Count parameters:C259; 3))
+						
+						This:C1470.setAttribute($node; $attribute; $value)
+						
+					End if 
+					
+					//______________________________________________________
+				: (Value type:C1509($attribute)=Is object:K8:27)
+					
+					var $t : Text
+					
+					For each ($t; $attribute) While (This:C1470.success)
+						
+						DOM SET XML ATTRIBUTE:C866($node; \
+							$t; $attribute[$t])
+						This:C1470.success:=Bool:C1537(OK)
+						
+					End for each 
+					
+					If (Not:C34(This:C1470.success))
+						
+						This:C1470.errors.push(Current method name:C684+" -  Failed to set attribute \""+$t+"\"")
+						
+					End if 
+					
+					//______________________________________________________
+				: (Value type:C1509($attribute)=Is collection:K8:32)
+					
+					var $o : Object
+					
+					For each ($o; $attribute) While (This:C1470.success)
+						
+						DOM SET XML ATTRIBUTE:C866($node; \
+							String:C10($o.key); $o.value)
+						This:C1470.success:=Bool:C1537(OK)
+						
+						If (Not:C34(This:C1470.success))
+							
+							This:C1470.errors.push(Current method name:C684+" -  Failed to set attribute \""+String:C10($o.key)+"\"")
+							
+						End if 
+					End for each 
+					
+					//______________________________________________________
+				Else 
+					
+					This:C1470.success:=False:C215
+					This:C1470.errors.push(Current method name:C684+" -  Unmanaged type: "+String:C10(Value type:C1509($node)))
+					
+					//______________________________________________________
+			End case 
+		End if 
+	End if 
+	
+	var $0 : Object
+	$0:=This:C1470
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Removes, if it exists, the attribute designated by $name from the XML $node
+Function removeAttribute($node : Text; $attribute : Text)
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
+		
+		If (Count parameters:C259>=2)
+			
+			If (OB Entries:C1720(This:C1470.getAttributes($node)).query("key=:1"; $attribute).pop()#Null:C1517)
+				
+				DOM REMOVE XML ATTRIBUTE:C1084($node; $attribute)
+				
+			End if 
+			
+		Else 
+			
+			If (OB Entries:C1720(This:C1470.getAttributes(This:C1470.root)).query("key=:1"; $attribute).pop()#Null:C1517)
+				
+				DOM REMOVE XML ATTRIBUTE:C1084($node; $attribute)
+				
+			End if 
+		End if 
 		
 		This:C1470.success:=Bool:C1537(OK)
 		
-	Else 
-		
-		This:C1470.errors.push(Current method name:C684+" -  Missing parameters")
-		
 	End if 
 	
-	$0:=This:C1470
-	
-/*———————————————————————————————————————————————————————————*/
-Function setAttributes  // Set a node attributes from an object or a collection (key/value pairs)
 	var $0 : Object
-	var $1 : Text
-	var $2 : Variant
-	var $3 : Variant
-	
-	var $t : Text
-	var $o : Object
-	
-	This:C1470.success:=(Count parameters:C259>=2)
-	
-	Case of 
-			
-			//______________________________________________________
-		: (Not:C34(This:C1470.success))
-			
-			This:C1470.errors.push(Current method name:C684+" -  Missing parameters")
-			
-			//______________________________________________________
-		: (Value type:C1509($2)=Is text:K8:3)
-			
-			This:C1470.success:=(Count parameters:C259=3)
-			
-			If (This:C1470.success)
-				
-				This:C1470.setAttribute($1; $2; $3)
-				
-			Else 
-				
-				This:C1470.errors.push(Current method name:C684+" -  Missing parameters")
-				
-			End if 
-			
-			//______________________________________________________
-		: (Value type:C1509($2)=Is object:K8:27)
-			
-			For each ($t; $2) While (This:C1470.success)
-				
-				DOM SET XML ATTRIBUTE:C866($1; \
-					$t; $2[$t])
-				This:C1470.success:=Bool:C1537(OK)
-				
-			End for each 
-			
-			If (Not:C34(This:C1470.success))
-				
-				This:C1470.errors.push(Current method name:C684+" -  Failed to set attribute \""+$t+"\"")
-				
-			End if 
-			
-			//______________________________________________________
-		: (Value type:C1509($2)=Is collection:K8:32)
-			
-			For each ($o; $2) While (This:C1470.success)
-				
-				DOM SET XML ATTRIBUTE:C866($1; \
-					String:C10($o.key); $o.value)
-				This:C1470.success:=Bool:C1537(OK)
-				
-			End for each 
-			
-			If (Not:C34(This:C1470.success))
-				
-				This:C1470.errors.push(Current method name:C684+" -  Failed to set attribute \""+String:C10($o.key)+"\"")
-				
-			End if 
-			
-			//______________________________________________________
-		Else 
-			
-			This:C1470.success:=False:C215
-			This:C1470.errors.push(Current method name:C684+" -  Unmanaged type: "+String:C10(Value type:C1509($1)))
-			
-			//______________________________________________________
-	End case 
-	
 	$0:=This:C1470
 	
-/*———————————————————————————————————————————————————————————*/
-Function setValue
-	var $1 : Text
-	var $2 : Variant
-	var $3 : Boolean
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Modifies the value of the element set by $node
+Function setValue($node : Text; $value : Variant; $inCDATA : Boolean)
 	
 	If (Count parameters:C259=3)
 		
-		If ($3)
+		If ($inCDATA)
 			
-			DOM SET XML ELEMENT VALUE:C868($1; $2; *)
+			DOM SET XML ELEMENT VALUE:C868($node; $value; *)
 			
 		Else 
 			
-			DOM SET XML ELEMENT VALUE:C868($1; $2)
+			DOM SET XML ELEMENT VALUE:C868($node; $value)
 			
 		End if 
 		
 	Else 
 		
-		DOM SET XML ELEMENT VALUE:C868($1; $2)
+		DOM SET XML ELEMENT VALUE:C868($node; $value)
 		
 	End if 
 	
 	This:C1470.success:=Bool:C1537(OK)
 	
-/*———————————————————————————————————————————————————————————*/
-Function __isReference
-	var $0 : Boolean
-	var $1 : Text
+	var $0 : Object
+	$0:=This:C1470
 	
-	$0:=Match regex:C1019("[[:xdigit:]]{32}"; $1; 1)
+	// —————————————————————————————————————————————————————————————————————————————————
+Function isNull($reference : Text)->$response : Boolean
 	
-/*———————————————————————————————————————————————————————————*/
-Function __convert
-	var $0 : Variant
-	var $1 : Text
+	$response:=Match regex:C1019("0{32}"; $reference; 1)
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+Function isNotNull($reference : Text)->$response : Boolean
+	
+	$response:=Not:C34(This:C1470.isNull($reference))
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+Function _requiredRef($reference : Text)->$response : Boolean
+	
+	$response:=Match regex:C1019("[[:xdigit:]]{32}"; $reference; 1)
+	
+	If (Not:C34($response))
+		
+		This:C1470.errors.push(Get call chain:C1662[1].name+" - Invalid XML element reference")
+		
+	End if 
+	
+	This:C1470.success:=$response
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+Function _requiredParams($count; $number)->$response : Boolean
+	
+	$response:=$count>=$number
+	
+	If (Not:C34($response))
+		
+		This:C1470.errors.push(Get call chain:C1662[1].name+" - Missing one or more parameters")
+		
+	End if 
+	
+	This:C1470.success:=$response
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+Function isReference($text : Text)->$response : Boolean
+	
+	$response:=Match regex:C1019("[[:xdigit:]]{32}"; $text; 1)
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+Function _convert($textValue : Text)->$value
 	
 	Case of 
 			
 			//______________________________________________________
-		: (Match regex:C1019("(?m-is)^(?:[tT]rue|[fF]alse)$"; $1; 1))
+		: (Match regex:C1019("(?m-is)^(?:[tT]rue|[fF]alse)$"; $textValue; 1))
 			
-			$0:=($1="true")
-			
-			//______________________________________________________
-		: (Match regex:C1019("(?m-si)^(?:\\+|-)?\\d+(?:\\.|"+$1+"\\d+)?$"; $1; 1))
-			
-			$0:=Num:C11($1)
+			$value:=($textValue="true")
 			
 			//______________________________________________________
-		: (Match regex:C1019("(?m-si)^\\d+-\\d+-\\d+$"; $1; 1))
+		: (Match regex:C1019("(?m-si)^(?:\\+|-)?\\d+(?:\\.|"+$textValue+"\\d+)?$"; $textValue; 1))
 			
-			$0:=Date:C102($1+"T00:00:00")
+			$value:=Num:C11($textValue)
+			
+			//______________________________________________________
+		: (Match regex:C1019("(?m-si)^\\d+-\\d+-\\d+$"; $textValue; 1))
+			
+			$value:=Date:C102($textValue+"T00:00:00")
 			
 			//______________________________________________________
 		Else 
 			
-			$0:=$1
+			$value:=$textValue
 			
 			//______________________________________________________
 	End case 
 	
-/*———————————————————————————————————————————————————————————*/
-Function __close
-	var $1 : Boolean
+	// —————————————————————————————————————————————————————————————————————————————————
+Function _close($keepOpened : Boolean)
 	
 	If (This:C1470.autoClose)
 		
 		If (Count parameters:C259>=1)
 			
-			If (Not:C34($1))
+			If (Not:C34($keepOpened))
 				
 				This:C1470.close()
 				
@@ -1150,3 +1325,5 @@ Function __close
 		// ⚠️ XML tree is not closed
 		
 	End if 
+	
+	// —————————————————————————————————————————————————————————————————————————————————
