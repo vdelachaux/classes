@@ -381,6 +381,25 @@ Function create
 	End if 
 	
 	//———————————————————————————————————————————————————————————
+	// Insert a XML element among the child elements of the $target element
+Function insert($target : Text; $source : Text; $index : Integer)->$node : Text
+	
+	var $indx : Integer
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 2))
+		
+		If (Count parameters:C259>=3)
+			
+			$indx:=$index
+			
+		End if 
+		
+		$node:=DOM Insert XML element:C1083($target; $source; $indx)
+		This:C1470.success:=Bool:C1537(OK)
+		
+	End if 
+	
+	//———————————————————————————————————————————————————————————
 	// Makes a copy of the given object
 Function clone($source : Text; $target : Text)->$node : Text
 	
@@ -396,7 +415,7 @@ Function clone($source : Text; $target : Text)->$node : Text
 	End if 
 	
 	//———————————————————————————————————————————————————————————/
-	// Returns the SVG tree as text
+	// Returns the XML tree as text
 Function content($keepStructure : Boolean)->$xml : Text
 	
 	DOM EXPORT TO VAR:C863(This:C1470.root; $xml)
@@ -1032,6 +1051,7 @@ Function getValue($node : Text)->$value : Variant
 	// —————————————————————————————————————————————————————————————————————————————————
 	// Returns one node attribute value if exists
 Function getAttribute($node : Text; $attribute : Text)->$value
+	
 	var $o : Object
 	
 	If (This:C1470._requiredParams(Count parameters:C259; 2))
@@ -1046,6 +1066,24 @@ Function getAttribute($node : Text; $attribute : Text)->$value
 		Else 
 			
 			This:C1470.errors.push(Current method name:C684+" -  Attribute \""+$attribute+"\" not found")
+			
+		End if 
+	End if 
+	
+	// —————————————————————————————————————————————————————————————————————————————————
+	// Returns a remove attributes value if exists
+Function attributePop($node : Text; $attribute : Text)->$value
+	
+	var $o : Object
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 2))
+		
+		$o:=OB Entries:C1720(This:C1470.getAttributes($node)).query("key = :1"; $attribute).pop()
+		
+		If ($o#Null:C1517)
+			
+			$value:=$o.value
+			DOM REMOVE XML ATTRIBUTE:C1084($node; $attribute)
 			
 		End if 
 	End if 

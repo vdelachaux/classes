@@ -20,9 +20,83 @@ Class constructor($variableOrFile)
 	This:C1470.image:=Null:C1517
 	This:C1470.store:=New collection:C1472
 	
+	This:C1470._notContainer:=New collection:C1472("rect"; "line"; "image"; "circle"; "ellipse"; "path"; "polygon"; "polyline"; "use")
+	This:C1470._aspectRatioValues:=New collection:C1472("none"; "xMinYMin"; "xMidYMin"; "xMaxYMin"; "xMinYMid"; "xMidYMid"; "xMaxYMid"; "xMinYMax"; "xMidYMax"; "xMaxYMax")
+	
+	
 /*================================================================
-                         DOCUMENTS
+                  DOCUMENTS & STRUCTURE
 ================================================================*/
+	
+	//———————————————————————————————————————————————————————————/
+	// Returns the picture described by the SVG structure
+Function picture($exportType : Variant; $keepStructure : Boolean)->$picture : Picture
+	
+	Case of 
+			
+			//______________________________________________________
+		: (Count parameters:C259>=2)  // $exportType & $keepStructure
+			
+			SVG EXPORT TO PICTURE:C1017(This:C1470.root; $picture; Num:C11($exportType))
+			
+			If (This:C1470.autoClose)\
+				 & (Not:C34($keepStructure))
+				
+				This:C1470.close()
+				
+			End if 
+			
+			//______________________________________________________
+		: (Count parameters:C259>=1)  // $exportType | $keepStructure
+			
+			If (Value type:C1509($exportType)=Is boolean:K8:9)  // $keepStructure
+				
+				SVG EXPORT TO PICTURE:C1017(This:C1470.root; $picture; Copy XML data source:K45:17)
+				
+				If (This:C1470.autoClose)\
+					 & (Not:C34($exportType))
+					
+					This:C1470.close()
+					
+				End if 
+				
+			Else   // $exportType
+				
+				SVG EXPORT TO PICTURE:C1017(This:C1470.root; $picture; Num:C11($exportType))
+				
+				If (This:C1470.autoClose)
+					
+					This:C1470.close()
+					
+				End if 
+			End if 
+			
+			//______________________________________________________
+		Else 
+			
+			SVG EXPORT TO PICTURE:C1017(This:C1470.root; $picture; Copy XML data source:K45:17)
+			
+			If (This:C1470.autoClose)
+				
+				This:C1470.close()
+				
+			End if 
+			
+			//______________________________________________________
+	End case 
+	
+	This:C1470.success:=(Picture size:C356($picture)>0)
+	
+	If (This:C1470.success)
+		
+		This:C1470.image:=$picture
+		
+	Else 
+		
+		This:C1470.image:=Null:C1517
+		This:C1470.errors.push("Failed to convert SVG structure as picture.")
+		
+	End if 
 	
 	//———————————————————————————————————————————————————————————/
 	// Writes the content of the SVG tree into a disk file
@@ -52,6 +126,7 @@ Function exportPicture($file : 4D:C1709.file; $keepStructure : Boolean)->$this :
 		
 	Else 
 		
+		// Auto
 		$picture:=This:C1470.picture()
 		
 	End if 
@@ -64,13 +139,94 @@ Function exportPicture($file : 4D:C1709.file; $keepStructure : Boolean)->$this :
 	
 	$this:=This:C1470
 	
+	//———————————————————————————————————————————————————————————
+	// Close the current tree if any & create a new svg default structure.
+Function new($attributes : Object)->$this : cs:C1710.svg
 	
-/*================================================================
-                       BASICS ELEMENTS
-================================================================*/
+	var $node; $t : Text
+	
+	This:C1470.close()  // Release memory
+	
+	$node:=DOM Create XML Ref:C861("svg"; "http://www.w3.org/2000/svg")
+	This:C1470.success:=Bool:C1537(OK)
+	
+	If (This:C1470.success)
+		
+		This:C1470.root:=$node
+		
+		DOM SET XML ATTRIBUTE:C866($node; \
+			"xmlns:xlink"; "http://www.w3.org/1999/xlink")
+		
+		DOM SET XML DECLARATION:C859($node; "UTF-8"; True:C214)
+		XML SET OPTIONS:C1090($node; XML indentation:K45:34; Choose:C955(Is compiled mode:C492; XML no indentation:K45:36; XML with indentation:K45:35))
+		
+		This:C1470.success:=Bool:C1537(OK)
+		
+		If (This:C1470.success)
+			
+			// Default values
+			DOM SET XML ATTRIBUTE:C866(This:C1470.root; \
+				"viewport-fill"; "none"; \
+				"fill"; "none"; \
+				"stroke"; "black"; \
+				"font-family"; "'lucida grande','segoe UI',sans-serif"; \
+				"font-size"; 12; \
+				"text-rendering"; "geometricPrecision"; \
+				"shape-rendering"; "crispEdges"; \
+				"preserveAspectRatio"; "none")
+			
+		End if 
+	End if 
+	
+	This:C1470.success:=Bool:C1537(OK) & (This:C1470.root#Null:C1517)
+	
+	If (This:C1470.success)
+		
+		If (Count parameters:C259>=1)
+			
+			If ($attributes#Null:C1517)
+				
+				For each ($t; $attributes)
+					
+					Case of 
+							
+							//_______________________
+						: ($t="keepReference")
+							
+							This:C1470.autoClose:=Bool:C1537($attributes[$t])
+							
+							//_______________________
+						Else 
+							
+							DOM SET XML ATTRIBUTE:C866(This:C1470.root; \
+								$t; $attributes[$t])
+							
+							//______________________
+					End case 
+				End for each 
+				
+			Else 
+				
+				// <NOTHING MORE TO DO>
+				
+			End if 
+			
+		Else 
+			
+			// <NOTHING MORE TO DO>
+			
+		End if 
+		
+	Else 
+		
+		This:C1470.errors.push("Failed to create SVG structure.")
+		
+	End if 
+	
+	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function group($id : Text; $attachTo : Variant)->$this : cs:C1710.svg
+Function group($id : Text; $attachTo)->$this : cs:C1710.svg
 	
 	var $parent : Text
 	
@@ -100,7 +256,181 @@ Function group($id : Text; $attachTo : Variant)->$this : cs:C1710.svg
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function rect($height : Real; $WidthOrNode : Variant; $attachTo : Variant)->$this : cs:C1710.svg
+	// Adds item to parent item
+Function attachTo($parent)->$this : cs:C1710.svg
+	
+	var $id; $node; $applyTo : Text
+	
+	If (Count parameters:C259>=1)
+		
+		$applyTo:=This:C1470._attachTo($parent)
+		
+	Else 
+		
+		// Auto
+		$applyTo:=This:C1470._attachTo()
+		
+	End if 
+	
+	$node:=This:C1470.latest
+	
+	// Keeps id and removes it, if any, to avoid duplicate one
+	$id:=String:C10(This:C1470.attributePop($node; "id"))
+	
+	This:C1470.latest:=Super:C1706.clone($node; $applyTo)
+	This:C1470.remove($node)
+	
+	// Restore id, if any
+	If (Length:C16($id)>0)
+		
+		This:C1470.id($id)
+		
+	End if 
+	
+	$this:=This:C1470
+	
+	//———————————————————————————————————————————————————————————
+	// Store the last created element as symbol
+Function symbol($id : Text; $applyTo)->$this : cs:C1710.svg
+	
+	var $defs; $node; $source; $symbol : Text
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
+		
+		$defs:=This:C1470._defs()
+		
+		If (This:C1470.success)
+			
+			If (Count parameters:C259>=2)
+				
+				$source:=This:C1470._applyTo($applyTo)
+				
+			Else 
+				
+				// Auto
+				$source:=This:C1470._applyTo()
+				
+			End if 
+			
+			$symbol:=Super:C1706.create($defs; "symbol")
+			
+			If (This:C1470.success)
+				
+				Super:C1706.setAttribute($symbol; "id"; $id)
+				
+				If (This:C1470.success)
+					
+					This:C1470.store.push(New object:C1471(\
+						"id"; $id; \
+						"dom"; $symbol))
+					
+					Super:C1706.setAttribute($symbol; "preserveAspectRatio"; "xMidYMid")
+					
+					$node:=Super:C1706.clone($source; $symbol)
+					This:C1470.remove($source)
+					
+				End if 
+				
+			Else 
+				
+				This:C1470.success:=False:C215
+				This:C1470.errors.push(Current method name:C684+" - Failed to create the symbol: "+$id)
+				
+			End if 
+			
+		Else 
+			
+			This:C1470.success:=False:C215
+			This:C1470.errors.push(Current method name:C684+" - Failed to locate/create the \"defs\" element")
+			
+		End if 
+	End if 
+	
+	// Restore the target preceding the creation of the symbol
+	This:C1470.latest:=Choose:C955(This:C1470._current=Null:C1517; This:C1470.root; This:C1470._current)
+	
+	$this:=This:C1470
+	
+	//———————————————————————————————————————————————————————————
+	// Place an occurence of the symbol
+Function use($id; $attachTo)->$this : cs:C1710.svg
+	
+	var $node; $parent : Text
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
+		
+		$node:=This:C1470.findById($id)
+		
+		If (This:C1470.success)
+			
+			If (Count parameters:C259>=2)
+				
+				$parent:=This:C1470._attachTo($attachTo)
+				
+			Else 
+				
+				// Auto
+				$parent:=This:C1470._attachTo()
+				
+			End if 
+			
+			This:C1470.latest:=Super:C1706.create($parent; "use")
+			
+			If (This:C1470.success)
+				
+				Super:C1706.setAttribute(This:C1470.latest; "xlink:href"; $id)
+				
+			End if 
+			
+		Else 
+			
+			This:C1470.errors.push(Current method name:C684+" - The id \""+$id+"\" doesn't exist!")
+			
+		End if 
+	End if 
+	
+	$this:=This:C1470
+	
+	//———————————————————————————————————————————————————————————/
+	// ⚠️ Overrides the method of the inherited class
+Function clone($source : Text; $attachTo)->$this : cs:C1710.svg
+	
+	var $parent; $applyTo : Text
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
+		
+		If (Count parameters:C259>=2)
+			
+			$parent:=This:C1470._attachTo($attachTo)
+			
+		Else 
+			
+			// Auto
+			$parent:=This:C1470._attachTo()
+			
+		End if 
+		
+		$applyTo:=This:C1470._applyTo($source)
+		
+		If (This:C1470.getAttributes($applyTo).id#Null:C1517)
+			
+			This:C1470.errors.push(Current method name:C684+" - As the id must be unique, it has been removed.")
+			
+		End if 
+		
+		This:C1470.latest:=Super:C1706.clone($applyTo; $parent)
+		
+	End if 
+	
+	$this:=This:C1470
+	
+	
+/*================================================================
+                       BASICS ELEMENTS
+================================================================*/
+	
+	//———————————————————————————————————————————————————————————
+Function rect($height : Real; $WidthOrNode : Variant; $attachTo)->$this : cs:C1710.svg
 	
 	var $parent : Text
 	var $width : Integer
@@ -121,6 +451,7 @@ Function rect($height : Real; $WidthOrNode : Variant; $attachTo : Variant)->$thi
 					
 				Else 
 					
+					// Auto
 					$parent:=This:C1470._attachTo()
 					
 				End if 
@@ -141,7 +472,7 @@ Function rect($height : Real; $WidthOrNode : Variant; $attachTo : Variant)->$thi
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function square($side : Real; $attachTo : Variant)->$this : cs:C1710.svg
+Function square($side : Real; $attachTo)->$this : cs:C1710.svg
 	
 	var $parent : Text
 	
@@ -153,6 +484,7 @@ Function square($side : Real; $attachTo : Variant)->$this : cs:C1710.svg
 			
 		Else 
 			
+			// Auto
 			$parent:=This:C1470._attachTo()
 			
 		End if 
@@ -166,7 +498,7 @@ Function square($side : Real; $attachTo : Variant)->$this : cs:C1710.svg
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function circle($radius : Real; $cx : Real; $cy : Real; $attachTo : Variant)->$this : cs:C1710.svg
+Function circle($radius : Real; $cx : Real; $cy : Real; $attachTo)->$this : cs:C1710.svg
 	
 	var $parent : Text
 	var $x; $y : Real
@@ -179,6 +511,7 @@ Function circle($radius : Real; $cx : Real; $cy : Real; $attachTo : Variant)->$t
 			
 		Else 
 			
+			// Auto
 			$parent:=This:C1470._attachTo()
 			
 		End if 
@@ -186,14 +519,11 @@ Function circle($radius : Real; $cx : Real; $cy : Real; $attachTo : Variant)->$t
 		If (Count parameters:C259>=2)
 			
 			$x:=$cx
+			$y:=$cx
 			
 			If (Count parameters:C259>=3)
 				
 				$y:=$cy
-				
-			Else 
-				
-				$y:=$x
 				
 			End if 
 		End if 
@@ -208,7 +538,7 @@ Function circle($radius : Real; $cx : Real; $cy : Real; $attachTo : Variant)->$t
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function ellipse($radiusX : Real; $radiusY : Real; $cx : Real; $cy : Real; $attachTo : Variant)->$this : cs:C1710.svg
+Function ellipse($radiusX : Real; $radiusY : Real; $cx : Real; $cy : Real; $attachTo)->$this : cs:C1710.svg
 	
 	var $parent : Text
 	
@@ -220,6 +550,7 @@ Function ellipse($radiusX : Real; $radiusY : Real; $cx : Real; $cy : Real; $atta
 			
 		Else 
 			
+			// Auto
 			$parent:=This:C1470._attachTo()
 			
 		End if 
@@ -246,7 +577,7 @@ Function ellipse($radiusX : Real; $radiusY : Real; $cx : Real; $cy : Real; $atta
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function imageEmbedded($picture : Picture; $attachTo : Variant)->$this : cs:C1710.svg
+Function imageEmbedded($picture : Picture; $attachTo)->$this : cs:C1710.svg
 	
 	var $parent; $t : Text
 	var $height; $width : Integer
@@ -256,11 +587,12 @@ Function imageEmbedded($picture : Picture; $attachTo : Variant)->$this : cs:C171
 		
 		If (Count parameters:C259>=2)
 			
-			$parent:=This:C1470._target($attachTo)
+			$parent:=This:C1470._applyTo($attachTo)
 			
 		Else 
 			
-			$parent:=This:C1470._target()
+			// Auto
+			$parent:=This:C1470._applyTo()
 			
 		End if 
 		
@@ -299,7 +631,7 @@ Function imageEmbedded($picture : Picture; $attachTo : Variant)->$this : cs:C171
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function line($x1 : Real; $y1 : Real; $x2 : Real; $y2 : Real; $attachTo : Variant)->$this : cs:C1710.svg
+Function line($x1 : Real; $y1 : Real; $x2 : Real; $y2 : Real; $attachTo)->$this : cs:C1710.svg
 	
 	var $parent : Text
 	
@@ -311,6 +643,7 @@ Function line($x1 : Real; $y1 : Real; $x2 : Real; $y2 : Real; $attachTo : Varian
 			
 		Else 
 			
+			// Auto
 			$parent:=This:C1470._attachTo()
 			
 		End if 
@@ -326,7 +659,7 @@ Function line($x1 : Real; $y1 : Real; $x2 : Real; $y2 : Real; $attachTo : Varian
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function imageRef($file : 4D:C1709.File; $attachTo : Variant)->$this : cs:C1710.svg
+Function imageRef($file : 4D:C1709.File; $attachTo)->$this : cs:C1710.svg
 	
 	var $parent; $t : Text
 	var $p : Picture
@@ -336,11 +669,12 @@ Function imageRef($file : 4D:C1709.File; $attachTo : Variant)->$this : cs:C1710.
 		
 		If (Count parameters:C259>=2)
 			
-			$parent:=This:C1470._target($attachTo)
+			$parent:=This:C1470._applyTo($attachTo)
 			
 		Else 
 			
-			$parent:=This:C1470._target()
+			// Auto
+			$parent:=This:C1470._applyTo()
 			
 		End if 
 		
@@ -391,18 +725,19 @@ Function imageRef($file : 4D:C1709.File; $attachTo : Variant)->$this : cs:C1710.
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function textArea($text : Text; $attachTo : Variant)->$this : cs:C1710.svg
+Function textArea($text : Text; $attachTo)->$this : cs:C1710.svg
 	
 	var $node; $parent; $substring; $t : Text
 	var $indx : Integer
 	
 	If (Count parameters:C259>=2)
 		
-		$parent:=This:C1470._target($attachTo)
+		$parent:=This:C1470._applyTo($attachTo)
 		
 	Else 
 		
-		$parent:=This:C1470._target()
+		// Auto
+		$parent:=This:C1470._applyTo()
 		
 	End if 
 	
@@ -458,43 +793,345 @@ Function textArea($text : Text; $attachTo : Variant)->$this : cs:C1710.svg
 	
 	$this:=This:C1470
 	
-	//———————————————————————————————————————————————————————————/
-	// ⚠️ Overrides the method of the inherited class
-Function clone($source : Text; $attachTo : Variant)->$this : cs:C1710.svg
+	//———————————————————————————————————————————————————————————
+	// Creates a set of connected straight line segments,
+	// generally resulting in an open shape usually without fill
+Function polyline($points : Variant; $attachTo)->$this : cs:C1710.svg
 	
-	var $parent : Text
+	If (Count parameters:C259>=2)
+		
+		This:C1470.latest:=Super:C1706.create(This:C1470._attachTo($attachTo); "polyline")
+		
+	Else 
+		
+		This:C1470.latest:=Super:C1706.create(This:C1470._attachTo(); "polyline")
+		
+	End if 
+	
+	If (This:C1470.success)
+		
+		Super:C1706.setAttribute(This:C1470.latest; "fill"; "none")
+		
+		If (Count parameters:C259>=1)
+			
+			This:C1470.points($points; This:C1470.latest)
+			
+		End if 
+	End if 
+	
+	$this:=This:C1470
+	
+	//———————————————————————————————————————————————————————————
+	// Defines a closed shape consisting of connected lines.
+Function polygon($points : Variant; $attachTo)->$this : cs:C1710.svg
+	
+	If (Count parameters:C259>=2)
+		
+		This:C1470.latest:=Super:C1706.create(This:C1470._attachTo($attachTo); "polygon")
+		
+	Else 
+		
+		This:C1470.latest:=Super:C1706.create(This:C1470._attachTo(); "polygon")
+		
+	End if 
+	
+	If (This:C1470.success)
+		
+		If (Count parameters:C259>=1)
+			
+			This:C1470.points($points; This:C1470.latest)
+			
+		End if 
+	End if 
+	
+	$this:=This:C1470
+	
+	//———————————————————————————————————————————————————————————
+	// Populate the "points" property of a polyline, polygon
+Function points($points : Variant; $applyTo)->$this : cs:C1710.svg
+	
+	var $name; $node : Text
+	var $i : Integer
 	
 	If (This:C1470._requiredParams(Count parameters:C259; 1))
 		
 		If (Count parameters:C259>=2)
 			
-			$parent:=This:C1470._attachTo($attachTo)
+			$node:=This:C1470._applyTo($applyTo)
 			
 		Else 
 			
-			$parent:=This:C1470._attachTo()
+			// Auto
+			$node:=This:C1470._applyTo()
 			
 		End if 
 		
-		This:C1470.latest:=Super:C1706.clone(This:C1470._target($source); $parent)
+		DOM GET XML ELEMENT NAME:C730($node; $name)
 		
+		Case of 
+				
+				//…………………………………………………………………………………………………
+			: ($name="polyline")\
+				 | ($name="polygon")
+				
+				Case of 
+						//______________________________________________________
+					: (Value type:C1509($points)=Is collection:K8:32)
+						
+						For ($i; 0; $points.length-1; 1)
+							
+							$points[$i]:=$points[$i].join(",")
+							
+						End for 
+						
+						Super:C1706.setAttribute($node; "points"; $points.join(" "))
+						
+						//______________________________________________________
+					: (Value type:C1509($points)=Is text:K8:3)
+						
+						Super:C1706.setAttribute($node; "points"; $points)
+						
+						//______________________________________________________
+					Else 
+						
+						// #ERROR
+						
+						//______________________________________________________
+				End case 
+				
+				//…………………………………………………………………………………………………
+			: ($name="path")
+				
+				// #TO_DO
+				
+				//…………………………………………………………………………………………………
+			Else 
+				
+				// #ERROR
+				
+				//…………………………………………………………………………………………………
+		End case 
 	End if 
 	
 	$this:=This:C1470
 	
+	//———————————————————————————————————————————————————————————
+	// Absolute moveTo
+Function M($points : Variant; $applyTo)->$this : cs:C1710.svg
+	
+	var $name; $node : Text
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
+		
+		If (Count parameters:C259>=2)
+			
+			$node:=This:C1470._applyTo($applyTo)
+			
+		Else 
+			
+			// Auto
+			$node:=This:C1470._applyTo()
+			
+		End if 
+		
+		DOM GET XML ELEMENT NAME:C730($node; $name)
+		
+		Case of 
+				
+				//______________________________________________________
+			: (Value type:C1509($points)=Is collection:K8:32)
+				
+				Case of 
+						
+						//…………………………………………………………………………………………………
+					: ($name="polyline")\
+						 | ($name="polygon")
+						
+						Super:C1706.setAttribute($node; "points"; String:C10($points[0]; "&xml")+","+String:C10($points[1]; "&xml"))
+						
+						//…………………………………………………………………………………………………
+					: ($name="path")
+						
+						// #TO_DO
+						
+						//…………………………………………………………………………………………………
+					Else 
+						
+						// #ERROR
+						
+						//…………………………………………………………………………………………………
+				End case 
+				
+				//______________________________________________________
+			: (Value type:C1509($points)=Is text:K8:3)
+				
+				Super:C1706.setAttribute($node; "points"; $points)
+				
+				//______________________________________________________
+			Else 
+				
+				// #ERROR
+				
+				//______________________________________________________
+		End case 
+	End if 
+	
+	$this:=This:C1470
+	
+	//———————————————————————————————————————————————————————————
+	// Absolute lineTo
+Function L($points : Variant; $applyTo)->$this : cs:C1710.svg
+	
+	var $name; $node; $t : Text
+	var $i : Integer
+	
+	If (This:C1470._requiredParams(Count parameters:C259; 1))
+		
+		If (Count parameters:C259>=2)
+			
+			$node:=This:C1470._applyTo($applyTo)
+			
+		Else 
+			
+			// Auto
+			$node:=This:C1470._applyTo()
+			
+		End if 
+		
+		DOM GET XML ELEMENT NAME:C730($node; $name)
+		
+		Case of 
+				
+				//______________________________________________________
+			: (Value type:C1509($points)=Is collection:K8:32)
+				
+				Case of 
+						
+						//…………………………………………………………………………………………………
+					: ($name="polyline")\
+						 | ($name="polygon")
+						
+						If ($points.length%2=0)
+							
+							For ($i; 0; $points.length-1; 2)
+								
+								$t:=$t+String:C10($points[$i]; "&xml")+" "+String:C10($points[$i+1]; "&xml")
+								
+							End for 
+							
+							Super:C1706.setAttribute($node; "points"; String:C10(This:C1470.getAttribute($node; "points"))+" "+$t)
+							
+						Else 
+							
+							// #ERROR
+							
+						End if 
+						
+						//…………………………………………………………………………………………………
+					: ($name="path")
+						
+						// #TO_DO
+						
+						//…………………………………………………………………………………………………
+					Else 
+						
+						// #ERROR
+						
+						//…………………………………………………………………………………………………
+				End case 
+				
+				//______________________________________________________
+			: (Value type:C1509($points)=Is text:K8:3)
+				
+				Super:C1706.setAttribute($node; "points"; String:C10(This:C1470.getAttribute($node; "points"))+" "+$points)
+				
+				//______________________________________________________
+			Else 
+				
+				// #ERROR
+				
+				//______________________________________________________
+		End case 
+	End if 
+	
+	$this:=This:C1470
+	
+	//———————————————————————————————————————————————————————————
+	// Relative moveTo
+Function m
+	
+	//#TO_DO
+	
+	//———————————————————————————————————————————————————————————
+	// Relative lineTo
+Function l
+	
+	//#TO_DO
+	
+	//———————————————————————————————————————————————————————————
+	// Populate the "d" property of a path
+Function d
+	
+	//#TO_DO
 	
 /*================================================================
                          ATTRIBUTES
 ================================================================*/
 	
 	//———————————————————————————————————————————————————————————
-Function id($id : Text)->$this : cs:C1710.svg
+Function preserveAspectRatio($value : Text; $applyTo)->$this : cs:C1710.svg
 	
 	var $node : Text
 	
-	$node:=This:C1470._target()
-	Super:C1706.setAttribute($node; "id"; $id)
-	This:C1470.push()
+	If (Count parameters:C259>=2)
+		
+		$node:=This:C1470._applyTo($applyTo)
+		
+	Else 
+		
+		// Auto
+		$node:=This:C1470._applyTo()
+		
+	End if 
+	
+	If (This:C1470._aspectRatioValues.indexOf($value)#-1)
+		
+		Super:C1706.setAttribute($node; "preserveAspectRatio"; $value)
+		
+	Else 
+		
+		Super:C1706.setAttribute($node; "preserveAspectRatio"; "xMidYMid")  // Set to default
+		
+	End if 
+	
+	//———————————————————————————————————————————————————————————
+Function id($id : Text; $applyTo)->$this : cs:C1710.svg
+	
+	var $node : Text
+	
+	$node:=This:C1470.findById($id)
+	
+	If (This:C1470.success)
+		
+		This:C1470.errors.push(Current method name:C684+" - The id \""+$id+"\" already exist!")
+		
+	Else 
+		
+		If (Count parameters:C259>=2)
+			
+			$node:=This:C1470._applyTo($applyTo)
+			
+		Else 
+			
+			// Auto
+			$node:=This:C1470._applyTo()
+			
+		End if 
+		
+		Super:C1706.setAttribute($node; "id"; $id)
+		This:C1470.push()
+		
+	End if 
 	
 	$this:=This:C1470
 	
@@ -503,7 +1140,7 @@ Function dimensions($width : Real; $height : Real; $unit : Text)->$this : cs:C17
 	
 	var $node; $name : Text
 	
-	$node:=This:C1470._target()
+	$node:=This:C1470._applyTo()
 	DOM GET XML ELEMENT NAME:C730($node; $name)
 	
 	Case of 
@@ -584,55 +1221,193 @@ Function dimensions($width : Real; $height : Real; $unit : Text)->$this : cs:C17
 /*———————————————————————————————————————————————————————————*/
 Function position($x : Real; $y : Variant; $unit : Text)->$this : cs:C1710.svg
 	
-	var $node : Text
+	var $element; $node : Text
 	
-	$node:=This:C1470._target()
-	This:C1470.success:=($node#This:C1470.root)
+	$node:=This:C1470._applyTo()
+	$element:=This:C1470.getName($node)
 	
-	If (This:C1470.success)
-		
-		If (Count parameters:C259>=2)
+	Case of 
 			
-			If (Value type:C1509($y)=Is text:K8:3)
-				
-				Super:C1706.setAttribute($node; "x"; String:C10($x; "&xml")+String:C10($y))
-				
-			Else 
-				
-				If (Count parameters:C259>2)
+			//______________________________________________________
+		: ($element="svg")\
+			 | ($element="g")
+			
+			This:C1470.success:=False:C215
+			This:C1470.errors.push(Current method name:C684+" You can't set position for the element"+$element+"!")
+			
+			//______________________________________________________
+		: ($element="circle")\
+			 | ($element="ellipse")
+			
+			Case of 
+					
+					//…………………………………………………………………………………………………
+				: (Count parameters:C259=3)
+					
+					If (Value type:C1509($y)=Is real:K8:4)
+						
+						Super:C1706.setAttributes($node; New object:C1471(\
+							"cx"; String:C10($x; "&xml")+$unit; \
+							"cy"; String:C10($y; "&xml")+$unit))
+						
+					Else 
+						
+						Super:C1706.setAttributes($node; New object:C1471(\
+							"cx"; String:C10($x; "&xml")+$unit; \
+							"cy"; String:C10(Num:C11($y); "&xml")+$unit))
+						
+					End if 
+					
+					//…………………………………………………………………………………………………
+				: (Count parameters:C259=2)
+					
+					If (Value type:C1509($y)=Is real:K8:4)
+						
+						Super:C1706.setAttributes($node; New object:C1471(\
+							"cx"; $x; \
+							"cy"; $y))
+						
+					Else 
+						
+						Super:C1706.setAttributes($node; New object:C1471(\
+							"cx"; String:C10($x; "&xml")+String:C10($y); \
+							"cy"; String:C10($x; "&xml")+String:C10($y)))
+						
+					End if 
+					
+					//…………………………………………………………………………………………………
+				: (Count parameters:C259=1)
 					
 					Super:C1706.setAttributes($node; New object:C1471(\
-						"x"; String:C10($x; "&xml")+String:C10($unit); \
-						"y"; String:C10(Num:C11($y); "&xml")+String:C10($unit)))
+						"cx"; $x; \
+						"cy"; $x))
 					
+					//…………………………………………………………………………………………………
 				Else 
+					
+					This:C1470.success:=False:C215
+					This:C1470.errors.push(Current method name:C684+" Missing parameter")
+					
+					//…………………………………………………………………………………………………
+			End case 
+			
+			//______________________________________________________
+		: ($element="line")
+			
+			Case of 
+					
+					//…………………………………………………………………………………………………
+				: (Count parameters:C259=3)
+					
+					If (Value type:C1509($y)=Is real:K8:4)
+						
+						Super:C1706.setAttributes($node; New object:C1471(\
+							"x1"; String:C10($x; "&xml")+$unit; \
+							"y1"; String:C10($y; "&xml")+$unit))
+						
+					Else 
+						
+						Super:C1706.setAttributes($node; New object:C1471(\
+							"x1"; String:C10($x; "&xml")+$unit; \
+							"y1"; String:C10(Num:C11($y); "&xml")+$unit))
+						
+					End if 
+					
+					//…………………………………………………………………………………………………
+				: (Count parameters:C259=2)
+					
+					If (Value type:C1509($y)=Is real:K8:4)
+						
+						Super:C1706.setAttributes($node; New object:C1471(\
+							"x1"; $x; \
+							"y1"; $y))
+						
+					Else 
+						
+						Super:C1706.setAttributes($node; New object:C1471(\
+							"x1"; String:C10($x; "&xml")+String:C10($y); \
+							"y1"; String:C10($x; "&xml")+String:C10($y)))
+						
+					End if 
+					
+					//…………………………………………………………………………………………………
+				: (Count parameters:C259=1)
+					
+					Super:C1706.setAttributes($node; New object:C1471(\
+						"x1"; $x; \
+						"y1"; $x))
+					
+					//…………………………………………………………………………………………………
+				Else 
+					
+					This:C1470.success:=False:C215
+					This:C1470.errors.push(Current method name:C684+" Missing parameter")
+					
+					//…………………………………………………………………………………………………
+			End case 
+			
+			//______________________________________________________
+		Else 
+			
+			Case of 
+					
+					//…………………………………………………………………………………………………
+				: (Count parameters:C259=3)
+					
+					If (Value type:C1509($y)=Is real:K8:4)
+						
+						Super:C1706.setAttributes($node; New object:C1471(\
+							"x"; String:C10($x; "&xml")+$unit; \
+							"y"; String:C10($y; "&xml")+$unit))
+						
+					Else 
+						
+						Super:C1706.setAttributes($node; New object:C1471(\
+							"x"; String:C10($x; "&xml")+$unit; \
+							"y"; String:C10(Num:C11($y); "&xml")+$unit))
+						
+					End if 
+					
+					//…………………………………………………………………………………………………
+				: (Count parameters:C259=2)
+					
+					If (Value type:C1509($y)=Is real:K8:4)
+						
+						Super:C1706.setAttributes($node; New object:C1471(\
+							"x"; $x; \
+							"y"; $y))
+						
+					Else 
+						
+						Super:C1706.setAttributes($node; New object:C1471(\
+							"x"; String:C10($x; "&xml")+String:C10($y); \
+							"y"; String:C10($x; "&xml")+String:C10($y)))
+						
+					End if 
+					
+					//…………………………………………………………………………………………………
+				: (Count parameters:C259=1)
 					
 					Super:C1706.setAttributes($node; New object:C1471(\
 						"x"; $x; \
-						"y"; Num:C11($y)))
+						"y"; $x))
 					
-				End if 
-			End if 
+					//…………………………………………………………………………………………………
+				Else 
+					
+					This:C1470.success:=False:C215
+					This:C1470.errors.push(Current method name:C684+" Missing parameter")
+					
+					//…………………………………………………………………………………………………
+			End case 
 			
-		Else 
-			
-			Super:C1706.setAttribute($node; "x"; String:C10($x; "&xml"))
-			
-		End if 
-		
-		This:C1470.success:=Bool:C1537(OK)
-		
-	Else 
-		
-		This:C1470.errors.push("You can't set position for the canvas!")
-		
-	End if 
+			//______________________________________________________
+	End case 
 	
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-	// Translation
-Function translate($x : Real; $y : Real; $target)->$this : cs:C1710.svg
+Function translate($x : Real; $y : Real; $applyTo)->$this : cs:C1710.svg
 	
 	var $node; $t; $transform : Text
 	var $indx : Integer
@@ -640,11 +1415,12 @@ Function translate($x : Real; $y : Real; $target)->$this : cs:C1710.svg
 	
 	If (Count parameters:C259>=3)
 		
-		$node:=This:C1470._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=This:C1470._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
@@ -669,6 +1445,10 @@ Function translate($x : Real; $y : Real; $target)->$this : cs:C1710.svg
 		
 		$transform:=$c.join(" ")
 		
+	Else 
+		
+		This:C1470.errors.remove(This:C1470.errors.length-1)
+		
 	End if 
 	
 	Super:C1706.setAttribute($node; "transform"; $transform)
@@ -676,59 +1456,94 @@ Function translate($x : Real; $y : Real; $target)->$this : cs:C1710.svg
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-	// Horizontal translation
-Function moveHorizontally($x : Real; $target)->$this : cs:C1710.svg
+Function rotate($angle : Integer; $cx : Variant; $cy : Real; $applyTo)->$this : cs:C1710.svg
 	
-	var $node : Text
+	var $node; $t; $transform : Text
+	var $indx : Integer
+	var $c : Collection
 	
-	If (Count parameters:C259>=2)
+	If (Count parameters:C259>=4)
 		
-		$node:=This:C1470._target($target)
+		$node:=This:C1470._applyTo($applyTo)
+		$transform:="rotate("+String:C10($angle)+" "+String:C10($cx; "&xml")+" "+String:C10($cy; "&xml")+")"
 		
 	Else 
 		
-		$node:=This:C1470._target()
+		If (Count parameters:C259=3)
+			
+			// Auto
+			$node:=This:C1470._applyTo()
+			$transform:="rotate("+String:C10($angle)+" "+String:C10($cx; "&xml")+" "+String:C10($cy; "&xml")+")"
+			
+		Else 
+			
+			If (Count parameters:C259=2)
+				
+				If (Value type:C1509($cx)=Is text:K8:3)
+					
+					$node:=This:C1470._applyTo($cx)
+					
+				Else 
+					
+					$node:=This:C1470._applyTo()
+					
+				End if 
+				
+			Else 
+				
+				$node:=This:C1470._applyTo()
+				
+			End if 
+			
+			$transform:="rotate("+String:C10($angle)+")"
+			
+		End if 
+	End if 
+	
+	$t:=This:C1470.getAttribute($node; "transform")
+	
+	If (Length:C16($t)>0)
+		
+		$c:=Split string:C1554($t; " ")
+		$indx:=$c.indexOf("rotate(@")
+		
+		If ($indx#-1)
+			
+			$c[$indx]:=$transform
+			
+		Else 
+			
+			$c.push($transform)
+			
+		End if 
+		
+		$transform:=$c.join(" ")
+		
+	Else 
+		
+		This:C1470.errors.remove(This:C1470.errors.length-1)
 		
 	End if 
 	
-	This:C1470.translate($x; 0; $node)
+	Super:C1706.setAttribute($node; "transform"; $transform)
 	
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-	// Horizontal translation
-Function moveVertically($y : Real; $target)->$this : cs:C1710.svg
+Function scale($x : Real; $applyTo)->$this : cs:C1710.svg
 	
-	var $node : Text
-	
-	If (Count parameters:C259>=2)
-		
-		$node:=This:C1470._target($target)
-		
-	Else 
-		
-		$node:=This:C1470._target()
-		
-	End if 
-	
-	This:C1470.translate(0; $y; $node)
-	
-	$this:=This:C1470
-	
-	//———————————————————————————————————————————————————————————
-	// Scale
-Function scale($x : Real; $target)->$this : cs:C1710.svg
 	var $node; $t; $transform : Text
 	var $indx : Integer
 	var $c : Collection
 	
 	If (Count parameters:C259>=2)
 		
-		$node:=This:C1470._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=This:C1470._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
@@ -754,6 +1569,10 @@ Function scale($x : Real; $target)->$this : cs:C1710.svg
 		
 		$transform:=$c.join(" ")
 		
+	Else 
+		
+		This:C1470.errors.remove(This:C1470.errors.length-1)
+		
 	End if 
 	
 	Super:C1706.setAttribute($node; "transform"; $transform)
@@ -761,17 +1580,48 @@ Function scale($x : Real; $target)->$this : cs:C1710.svg
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function font($attributes : Object; $target)->$this : cs:C1710.svg
+Function moveHorizontally($x : Real; $applyTo)->$this : cs:C1710.svg
+	
+	If (Count parameters:C259>=2)
+		
+		This:C1470.translate($x; 0; This:C1470._applyTo($applyTo))
+		
+	Else 
+		
+		This:C1470.translate($x; 0; This:C1470._applyTo())
+		
+	End if 
+	
+	$this:=This:C1470
+	
+	//———————————————————————————————————————————————————————————
+Function moveVertically($y : Real; $applyTo)->$this : cs:C1710.svg
+	
+	If (Count parameters:C259>=2)
+		
+		This:C1470.translate(0; $y; This:C1470._applyTo($applyTo))
+		
+	Else 
+		
+		This:C1470.translate(0; $y; This:C1470._applyTo())
+		
+	End if 
+	
+	$this:=This:C1470
+	
+	//———————————————————————————————————————————————————————————
+Function font($attributes : Object; $applyTo)->$this : cs:C1710.svg
 	
 	var $node : Text
 	
 	If (Count parameters:C259>=2)
 		
-		$node:=This:C1470._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=This:C1470._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
@@ -814,47 +1664,48 @@ Function font($attributes : Object; $target)->$this : cs:C1710.svg
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function fontFamily($fonts : Text; $target)->$this : cs:C1710.svg
+Function fontFamily($fonts : Text; $applyTo)->$this : cs:C1710.svg
 	
 	If (Count parameters:C259>=2)
 		
-		Super:C1706.setAttribute(This:C1470._target($target); "font-family"; $fonts)
+		Super:C1706.setAttribute(This:C1470._applyTo($applyTo); "font-family"; $fonts)
 		
 	Else 
 		
-		Super:C1706.setAttribute(This:C1470._target(); "font-family"; $fonts)
+		Super:C1706.setAttribute(This:C1470._applyTo(); "font-family"; $fonts)
 		
 	End if 
 	
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function fontSize($size : Integer; $target)->$this : cs:C1710.svg
+Function fontSize($size : Integer; $applyTo)->$this : cs:C1710.svg
 	
 	If (Count parameters:C259>=2)
 		
-		Super:C1706.setAttribute(This:C1470._target($target); "font-size"; $size)
+		Super:C1706.setAttribute(This:C1470._applyTo($applyTo); "font-size"; $size)
 		
 	Else 
 		
-		Super:C1706.setAttribute(This:C1470._target(); "font-size"; $size)
+		Super:C1706.setAttribute(This:C1470._applyTo(); "font-size"; $size)
 		
 	End if 
 	
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function fontStyle($style : Integer; $target)->$this : cs:C1710.svg
+Function fontStyle($style : Integer; $applyTo)->$this : cs:C1710.svg
 	
 	var $node : Text
 	
 	If (Count parameters:C259>=2)
 		
-		$node:=This:C1470._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=This:C1470._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
@@ -904,17 +1755,18 @@ Function fontStyle($style : Integer; $target)->$this : cs:C1710.svg
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function alignment($alignment : Integer; $target)->$this : cs:C1710.svg
+Function alignment($alignment : Integer; $applyTo)->$this : cs:C1710.svg
 	
 	var $node; $type : Text
 	
 	If (Count parameters:C259>=2)
 		
-		$node:=This:C1470._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=This:C1470._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
@@ -987,17 +1839,18 @@ Function alignment($alignment : Integer; $target)->$this : cs:C1710.svg
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————
-Function textRendering($rendering : Text; $target)->$this : cs:C1710.svg
+Function textRendering($rendering : Text; $applyTo)->$this : cs:C1710.svg
 	
 	var $node : Text
 	
 	If (Count parameters:C259>=2)
 		
-		$node:=This:C1470._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=This:C1470._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
@@ -1016,15 +1869,15 @@ Function textRendering($rendering : Text; $target)->$this : cs:C1710.svg
 	
 	//———————————————————————————————————————————————————————————/
 	// ⚠️ Overrides the method of the inherited class
-Function setAttribute($name : Text; $value : Variant; $target)->$this : cs:C1710.svg
+Function setAttribute($name : Text; $value : Variant; $applyTo)->$this : cs:C1710.svg
 	
 	If (Count parameters:C259=3)
 		
-		Super:C1706.setAttribute(This:C1470._target($target); $name; $value)
+		Super:C1706.setAttribute(This:C1470._applyTo($applyTo); $name; $value)
 		
 	Else 
 		
-		Super:C1706.setAttribute(This:C1470._target(); $name; $value)
+		Super:C1706.setAttribute(This:C1470._applyTo(); $name; $value)
 		
 	End if 
 	
@@ -1032,7 +1885,7 @@ Function setAttribute($name : Text; $value : Variant; $target)->$this : cs:C1710
 	
 	//———————————————————————————————————————————————————————————/
 	// ⚠️ Overrides the method of the inherited class
-Function setAttributes($attributes : Variant; $value : Variant; $target)->$this : cs:C1710.svg
+Function setAttributes($attributes : Variant; $value : Variant; $applyTo)->$this : cs:C1710.svg
 	
 	var $node; $t : Text
 	var $o : Object
@@ -1045,7 +1898,7 @@ Function setAttributes($attributes : Variant; $value : Variant; $target)->$this 
 			
 			If ($attributes#Null:C1517)
 				
-				$node:=This:C1470._target($attributes)
+				$node:=This:C1470._applyTo($attributes)
 				
 				$c:=OB Entries:C1720($attributes)
 				
@@ -1066,12 +1919,12 @@ Function setAttributes($attributes : Variant; $value : Variant; $target)->$this 
 			
 			If ($o#Null:C1517)
 				
-				$node:=This:C1470._target($o.value)
+				$node:=This:C1470._applyTo($o.value)
 				
 			Else 
 				
-				// Applies to the latest
-				$node:=This:C1470._target()
+				// Auto
+				$node:=This:C1470._applyTo()
 				
 			End if 
 			
@@ -1088,7 +1941,7 @@ Function setAttributes($attributes : Variant; $value : Variant; $target)->$this 
 			
 			If (Count parameters:C259=3)
 				
-				Super:C1706.setAttribute($target; $attributes; $value)
+				Super:C1706.setAttribute($applyTo; $attributes; $value)
 				
 			Else 
 				
@@ -1098,7 +1951,7 @@ Function setAttributes($attributes : Variant; $value : Variant; $target)->$this 
 					
 				Else 
 					
-					Super:C1706.setAttributes(This:C1470._target(); $attributes; $value)
+					Super:C1706.setAttributes(This:C1470._applyTo(); $attributes; $value)
 					
 				End if 
 			End if 
@@ -1115,7 +1968,7 @@ Function setAttributes($attributes : Variant; $value : Variant; $target)->$this 
 	
 	//———————————————————————————————————————————————————————————/
 	// ⚠️ Overrides the method of the inherited class
-Function setValue($value : Text; $target; $CDATA : Boolean)->$this : cs:C1710.svg
+Function setValue($value : Text; $applyTo; $CDATA : Boolean)->$this : cs:C1710.svg
 	
 	var $node : Text
 	var $isCDATA : Boolean
@@ -1125,25 +1978,25 @@ Function setValue($value : Text; $target; $CDATA : Boolean)->$this : cs:C1710.sv
 		If (Count parameters:C259>=3)
 			
 			$isCDATA:=$CDATA
-			$node:=This:C1470._target(String:C10($target))
+			$node:=This:C1470._applyTo(String:C10($applyTo))
 			
 		Else 
 			
-			If (Value type:C1509($target)=Is text:K8:3)
+			If (Value type:C1509($applyTo)=Is text:K8:3)
 				
-				$node:=This:C1470._target($target)
+				$node:=This:C1470._applyTo($applyTo)
 				
 			Else 
 				
-				$node:=This:C1470._target()
-				$isCDATA:=Bool:C1537($target)
+				$node:=This:C1470._applyTo()
+				$isCDATA:=Bool:C1537($applyTo)
 				
 			End if 
 		End if 
 		
 	Else 
 		
-		$node:=This:C1470._target()
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
@@ -1161,36 +2014,40 @@ Function setValue($value : Text; $target; $CDATA : Boolean)->$this : cs:C1710.sv
 	
 	//———————————————————————————————————————————————————————————
 	// Sets shape stroke and fill color.
-Function color($color : Text; $target)->$this : cs:C1710.svg
-	var $node : Text
+Function color($color : Text; $applyTo)->$this : cs:C1710.svg
 	
-	$this:=This:C1470
+	var $node : Text
 	
 	If (Count parameters:C259>=2)
 		
-		$node:=$this._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=$this._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
 	Super:C1706.setAttribute($node; "fill"; $color)
 	Super:C1706.setAttribute($node; "stroke"; $color)
 	
+	$this:=This:C1470
+	
 	//———————————————————————————————————————————————————————————/
 	// Sets opacity of stroke and fill.
-Function opacity($opacity : Real; $target)->$this : cs:C1710.svg
+Function opacity($opacity : Real; $applyTo)->$this : cs:C1710.svg
+	
 	var $node : Text
 	
 	If (Count parameters:C259>=2)
 		
-		$node:=This:C1470._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=This:C1470._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
@@ -1201,19 +2058,18 @@ Function opacity($opacity : Real; $target)->$this : cs:C1710.svg
 	
 	//———————————————————————————————————————————————————————————/
 	// Sets the fill attributes
-Function fill($value; $target)->$this : cs:C1710.svg
+Function fill($value; $applyTo)->$this : cs:C1710.svg
 	
 	var $node : Text
 	
-	$this:=This:C1470
-	
 	If (Count parameters:C259>=2)
 		
-		$node:=$this._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=$this._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
@@ -1250,7 +2106,6 @@ Function fill($value; $target)->$this : cs:C1710.svg
 					Super:C1706.setAttribute($node; "viewport-fill"; "none")
 					
 				End if 
-				
 				
 			Else 
 				
@@ -1307,24 +2162,25 @@ Function fill($value; $target)->$this : cs:C1710.svg
 			//______________________________________________________
 	End case 
 	
+	$this:=This:C1470
+	
 	//———————————————————————————————————————————————————————————/
-Function fillColor($color : Text; $target)->$this : cs:C1710.svg
+Function fillColor($color : Text; $applyTo)->$this : cs:C1710.svg
 	
 	var $node : Text
 	
-	$this:=This:C1470
-	
 	If (Count parameters:C259>=2)
 		
-		$node:=$this._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=$this._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
-	If ($node=$this.root)
+	If ($node=This:C1470.root)
 		
 		Super:C1706.setAttribute($node; "viewport-fill"; $color)
 		
@@ -1334,24 +2190,25 @@ Function fillColor($color : Text; $target)->$this : cs:C1710.svg
 		
 	End if 
 	
+	$this:=This:C1470
+	
 	//———————————————————————————————————————————————————————————/
-Function fillOpacity($opacity : Real; $target)->$this : cs:C1710.svg
+Function fillOpacity($opacity : Real; $applyTo)->$this : cs:C1710.svg
 	
 	var $node : Text
 	
-	$this:=This:C1470
-	
 	If (Count parameters:C259>=2)
 		
-		$node:=$this._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=$this._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
-	If ($node=$this.root)
+	If ($node=This:C1470.root)
 		
 		Super:C1706.setAttribute($node; "viewport-fill-opacity"; $opacity)
 		
@@ -1361,21 +2218,22 @@ Function fillOpacity($opacity : Real; $target)->$this : cs:C1710.svg
 		
 	End if 
 	
+	$this:=This:C1470
+	
 	//———————————————————————————————————————————————————————————
 	// Sets the stroke attributes
-Function stroke($value; $target)->$this : cs:C1710.svg
+Function stroke($value; $applyTo)->$this : cs:C1710.svg
 	
 	var $node : Text
 	
-	$this:=This:C1470
-	
 	If (Count parameters:C259>=2)
 		
-		$node:=$this._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=$this._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
@@ -1444,61 +2302,63 @@ Function stroke($value; $target)->$this : cs:C1710.svg
 			//______________________________________________________
 	End case 
 	
+	$this:=This:C1470
+	
 	//———————————————————————————————————————————————————————————/
-Function strokeColor($color : Text; $target)->$this : cs:C1710.svg
+Function strokeColor($color : Text; $applyTo)->$this : cs:C1710.svg
 	
 	If (Count parameters:C259>=2)
 		
-		Super:C1706.setAttribute(This:C1470._target($target); "stroke"; $color)
+		Super:C1706.setAttribute(This:C1470._applyTo($applyTo); "stroke"; $color)
 		
 	Else 
 		
-		Super:C1706.setAttribute(This:C1470._target(); "stroke"; $color)
+		Super:C1706.setAttribute(This:C1470._applyTo(); "stroke"; $color)
 		
 	End if 
 	
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————/
-Function strokeWidth($width : Real; $target)->$this : cs:C1710.svg
+Function strokeWidth($width : Real; $applyTo)->$this : cs:C1710.svg
 	
 	If (Count parameters:C259>=2)
 		
-		Super:C1706.setAttribute(This:C1470._target($target); "stroke-width"; $width)
+		Super:C1706.setAttribute(This:C1470._applyTo($applyTo); "stroke-width"; $width)
 		
 	Else 
 		
-		Super:C1706.setAttribute(This:C1470._target(); "stroke-width"; $width)
+		Super:C1706.setAttribute(This:C1470._applyTo(); "stroke-width"; $width)
 		
 	End if 
 	
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————/
-Function strokeOpacity($opacity : Real; $target)->$this : cs:C1710.svg
+Function strokeOpacity($opacity : Real; $applyTo)->$this : cs:C1710.svg
 	
 	If (Count parameters:C259>=2)
 		
-		Super:C1706.setAttribute(This:C1470._target($target); "stroke-opacity"; $opacity)
+		Super:C1706.setAttribute(This:C1470._applyTo($applyTo); "stroke-opacity"; $opacity)
 		
 	Else 
 		
-		Super:C1706.setAttribute(This:C1470._target(); "stroke-opacity"; $opacity)
+		Super:C1706.setAttribute(This:C1470._applyTo(); "stroke-opacity"; $opacity)
 		
 	End if 
 	
 	$this:=This:C1470
 	
 	//———————————————————————————————————————————————————————————/
-Function visible($visible : Boolean; $target)->$this : cs:C1710.svg
+Function visible($visible : Boolean; $applyTo)->$this : cs:C1710.svg
 	
 	If (Count parameters:C259>=2)
 		
-		Super:C1706.setAttribute(This:C1470._target($target); "visibility"; Choose:C955($visible; "visible"; "hidden"))
+		Super:C1706.setAttribute(This:C1470._applyTo($applyTo); "visibility"; Choose:C955($visible; "visible"; "hidden"))
 		
 	Else 
 		
-		Super:C1706.setAttribute(This:C1470._target(); "visibility"; Choose:C955($visible; "visible"; "hidden"))
+		Super:C1706.setAttribute(This:C1470._applyTo(); "visibility"; Choose:C955($visible; "visible"; "hidden"))
 		
 	End if 
 	
@@ -1538,15 +2398,15 @@ Function styleSheet($file : 4D:C1709.File)->$this : cs:C1710.svg
 	
 	//———————————————————————————————————————————————————————————/
 	// Set the node class
-Function class($class : Text; $target)->$this : cs:C1710.svg
+Function class($class : Text; $applyTo)->$this : cs:C1710.svg
 	
 	If (Count parameters:C259=2)
 		
-		Super:C1706.setAttribute(This:C1470._target($target); "class"; $class)
+		Super:C1706.setAttribute(This:C1470._applyTo($applyTo); "class"; $class)
 		
 	Else 
 		
-		Super:C1706.setAttribute(This:C1470._target(); "class"; $class)
+		Super:C1706.setAttribute(This:C1470._applyTo(); "class"; $class)
 		
 	End if 
 	
@@ -1554,17 +2414,18 @@ Function class($class : Text; $target)->$this : cs:C1710.svg
 	
 	//———————————————————————————————————————————————————————————/
 	// Add a value to the node class
-Function addClass($class : Text; $target)->$this : cs:C1710.svg
+Function addClass($class : Text; $applyTo)->$this : cs:C1710.svg
 	
 	var $node; $t : Text
 	
 	If (Count parameters:C259=2)
 		
-		$node:=This:C1470._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=This:C1470._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
@@ -1590,17 +2451,18 @@ Function addClass($class : Text; $target)->$this : cs:C1710.svg
 	
 	//———————————————————————————————————————————————————————————/
 	// Fix the radius of a rounded rectangle
-Function rounded($radius : Integer; $target)->$this : cs:C1710.svg
+Function rounded($radius : Integer; $applyTo)->$this : cs:C1710.svg
 	
 	var $name; $node : Text
 	
 	If (Count parameters:C259=2)
 		
-		$node:=This:C1470._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=This:C1470._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
@@ -1621,185 +2483,9 @@ Function rounded($radius : Integer; $target)->$this : cs:C1710.svg
 	$this:=This:C1470
 	
 	
-	//———————————————————————————————————————————————————————————/
-	// Returns the picture described by the SVG structure
-Function picture($exportType : Variant; $keepStructure : Boolean)->$picture : Picture
-	
-	Case of 
-			
-			//______________________________________________________
-		: (Count parameters:C259>=2)  // $exportType & $keepStructure
-			
-			SVG EXPORT TO PICTURE:C1017(This:C1470.root; $picture; Num:C11($exportType))
-			
-			If (This:C1470.autoClose)\
-				 & (Not:C34($keepStructure))
-				
-				This:C1470.close()
-				
-			End if 
-			
-			//______________________________________________________
-		: (Count parameters:C259>=1)  // $exportType | $keepStructure
-			
-			If (Value type:C1509($exportType)=Is boolean:K8:9)  // $keepStructure
-				
-				SVG EXPORT TO PICTURE:C1017(This:C1470.root; $picture; Copy XML data source:K45:17)
-				
-				If (This:C1470.autoClose)\
-					 & (Not:C34($exportType))
-					
-					This:C1470.close()
-					
-				End if 
-				
-			Else   // $exportType
-				
-				SVG EXPORT TO PICTURE:C1017(This:C1470.root; $picture; Num:C11($exportType))
-				
-				If (This:C1470.autoClose)
-					
-					This:C1470.close()
-					
-				End if 
-			End if 
-			
-			//______________________________________________________
-		Else 
-			
-			SVG EXPORT TO PICTURE:C1017(This:C1470.root; $picture; Copy XML data source:K45:17)
-			
-			If (This:C1470.autoClose)
-				
-				This:C1470.close()
-				
-			End if 
-			
-			//______________________________________________________
-	End case 
-	
-	This:C1470.success:=(Picture size:C356($picture)>0)
-	
-	If (This:C1470.success)
-		
-		This:C1470.image:=$picture
-		
-	Else 
-		
-		This:C1470.image:=Null:C1517
-		This:C1470.errors.push("Failed to convert SVG structure as picture.")
-		
-	End if 
-	
-	//———————————————————————————————————————————————————————————
-	// Create a default SVG structure
-Function new($attributes : Object)->$this : cs:C1710.svg
-	
-	var $node; $t : Text
-	
-	This:C1470.close()  // Release memory
-	
-	$node:=DOM Create XML Ref:C861("svg"; "http://www.w3.org/2000/svg")
-	This:C1470.success:=Bool:C1537(OK)
-	
-	If (This:C1470.success)
-		
-		This:C1470.root:=$node
-		
-		DOM SET XML ATTRIBUTE:C866($node; \
-			"xmlns:xlink"; "http://www.w3.org/1999/xlink")
-		
-		DOM SET XML DECLARATION:C859($node; "UTF-8"; True:C214)
-		XML SET OPTIONS:C1090($node; XML indentation:K45:34; Choose:C955(Is compiled mode:C492; XML no indentation:K45:36; XML with indentation:K45:35))
-		
-		$node:=DOM Create XML element:C865(This:C1470.root; "def")
-		This:C1470.success:=Bool:C1537(OK)
-		
-		If (This:C1470.success)
-			
-			// Default values
-			DOM SET XML ATTRIBUTE:C866(This:C1470.root; \
-				"viewport-fill"; "none"; \
-				"fill"; "none"; \
-				"stroke"; "black"; \
-				"font-family"; "'lucida grande','segoe UI',sans-serif"; \
-				"font-size"; 12; \
-				"text-rendering"; "geometricPrecision"; \
-				"shape-rendering"; "crispEdges"; \
-				"preserveAspectRatio"; "none")
-			
-		End if 
-	End if 
-	
-	This:C1470.success:=Bool:C1537(OK) & (This:C1470.root#Null:C1517)
-	
-	If (This:C1470.success)
-		
-		If (Count parameters:C259>=1)
-			
-			If ($attributes#Null:C1517)
-				
-				For each ($t; $attributes)
-					
-					Case of 
-							
-							//_______________________
-						: ($t="keepReference")
-							
-							This:C1470.autoClose:=Bool:C1537($attributes[$t])
-							
-							//_______________________
-						Else 
-							
-							DOM SET XML ATTRIBUTE:C866(This:C1470.root; \
-								$t; $attributes[$t])
-							
-							//______________________
-					End case 
-				End for each 
-				
-			Else 
-				
-				// <NOTHING MORE TO DO>
-				
-			End if 
-			
-		Else 
-			
-			// <NOTHING MORE TO DO>
-			
-		End if 
-		
-	Else 
-		
-		This:C1470.errors.push("Failed to create SVG structure.")
-		
-	End if 
-	
-	$this:=This:C1470
-	
-	//———————————————————————————————————————————————————————————
-	// Adds item to parent item
-Function attachTo($parent : Variant)->$this : cs:C1710.svg
-	
-	var $node; $target : Text
-	
-	If (Count parameters:C259>=1)
-		
-		$target:=This:C1470._attachTo($parent)
-		
-	Else 
-		
-		$target:=This:C1470._attachTo()
-		
-	End if 
-	
-	$node:=This:C1470.latest
-	
-	This:C1470.latest:=Super:C1706.clone($node; $target)
-	This:C1470.remove($node)
-	
-	$this:=This:C1470
+/*================================================================
+                         UTILITIES
+================================================================*/
 	
 	//———————————————————————————————————————————————————————————
 	// Keep the dom reference for future use
@@ -1825,14 +2511,27 @@ Function push($name : Text)->$this : cs:C1710.svg
 		
 	Else 
 		
-		// Use id if any
+		// Use the id, if available
 		$id:=String:C10(This:C1470.getAttribute(This:C1470.latest; "id"))
 		
 		If (Length:C16($id)>0)
 			
-			This:C1470.store.push(New object:C1471(\
-				"id"; $id; \
-				"dom"; This:C1470.latest))
+			var $o : Object
+			$o:=This:C1470.store.query("id = :1"; $id).pop()
+			
+			If ($o=Null:C1517)
+				
+				// Create
+				This:C1470.store.push(New object:C1471(\
+					"id"; $id; \
+					"dom"; This:C1470.latest))
+				
+			Else 
+				
+				// Update
+				$o.dom:=This:C1470.latest
+				
+			End if 
 			
 		Else 
 			
@@ -1857,7 +2556,7 @@ Function fetch($name : Text)->$dom : Text
 		
 	Else 
 		
-		// Lastest
+		// Auto
 		$o:=New object:C1471(\
 			"dom"; This:C1470.latest)
 		
@@ -1877,17 +2576,18 @@ Function fetch($name : Text)->$dom : Text
 	
 	//———————————————————————————————————————————————————————————/
 	// Tests if the node belongs to a class
-Function isOfClass($class : Text; $target)->$isOfclass : Boolean
+Function isOfClass($class : Text; $applyTo)->$isOfclass : Boolean
 	
 	var $node : Text
 	
 	If (Count parameters:C259>=2)
 		
-		$node:=This:C1470._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=This:C1470._target()
+		// Auto
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
@@ -1940,12 +2640,13 @@ Function getTextWidth($string : Text; $fontAttributes : Object)->$width : Intege
 	$picture:=$o.picture()
 	PICTURE PROPERTIES:C457($picture; $width; $height)
 	
+	
 /*================================================================
                          PRIVATES
 ================================================================*/
 	
 	//———————————————————————————————————————————————————————————
-Function _target($target)->$node : Text
+Function _applyTo($applyTo)->$node : Text
 	
 	var $o : Object
 	
@@ -1959,28 +2660,28 @@ Function _target($target)->$node : Text
 			$node:=Choose:C955(This:C1470.latest#Null:C1517; This:C1470.latest; This:C1470.root)
 			
 			//______________________________________________________
-		: (Value type:C1509($target)=Is undefined:K8:13)
+		: (Value type:C1509($applyTo)=Is undefined:K8:13)
 			
 			$node:=Choose:C955(This:C1470.latest#Null:C1517; This:C1470.latest; This:C1470.root)
 			
 			//______________________________________________________
-		: (Value type:C1509($target)=Is text:K8:3)
+		: (Value type:C1509($applyTo)=Is text:K8:3)
 			
 			Case of 
 					
 					//_______________________________
-				: ($target="root")
+				: ($applyTo="root")
 					
 					$node:=This:C1470.root
 					
 					//_______________________________
-				: ($target="latest")
+				: ($applyTo="latest")
 					
 					$node:=Choose:C955(This:C1470.latest#Null:C1517; This:C1470.latest; This:C1470.root)
 					
 					//_______________________________
-				: ($target="parent")\
-					 | ($target="append")
+				: ($applyTo="parent")\
+					 | ($applyTo="append")
 					
 					If (This:C1470.latest=Null:C1517)
 						
@@ -1994,15 +2695,15 @@ Function _target($target)->$node : Text
 					End if 
 					
 					//_______________________________
-				: (This:C1470.isReference($target))
+				: (This:C1470.isReference($applyTo))
 					
-					$node:=$target  // The given reference
+					$node:=$applyTo  // The given reference
 					
 					//_______________________________
 				Else 
 					
 					// Find a memorized target
-					$o:=This:C1470.store.query("id=:1"; $target).pop()
+					$o:=This:C1470.store.query("id=:1"; $applyTo).pop()
 					
 					If ($o#Null:C1517)
 						
@@ -2011,7 +2712,7 @@ Function _target($target)->$node : Text
 					Else 
 						
 						This:C1470.success:=False:C215
-						This:C1470.errors.push("The element \""+$target+"\" doesn't exists")
+						This:C1470.errors.push("The element \""+$applyTo+"\" doesn't exists")
 						
 					End if 
 					
@@ -2019,15 +2720,15 @@ Function _target($target)->$node : Text
 			End case 
 			
 			//______________________________________________________
-		: (Value type:C1509($target)=Is object:K8:27)
+		: (Value type:C1509($applyTo)=Is object:K8:27)
 			
-			If ($target.target#Null:C1517)
+			If ($applyTo.target#Null:C1517)
 				
-				$node:=String:C10($target.target)
+				$node:=String:C10($applyTo.target)
 				
 			Else 
 				
-				This:C1470._target("latest")
+				This:C1470._applyTo("latest")
 				
 			End if 
 			
@@ -2041,27 +2742,63 @@ Function _target($target)->$node : Text
 	End case 
 	
 	//———————————————————————————————————————————————————————————
-Function _attachTo($target)->$node : Text
+	// Get an available container
+Function _attachTo($applyTo)->$node : Text
+	
+	// Keep a backup of the current item reference.
+	// We might need it, if the created element is assigned to a symbol
+	This:C1470._current:=This:C1470.latest
 	
 	If (Count parameters:C259>=1)
 		
-		$node:=This:C1470._target($target)
+		$node:=This:C1470._applyTo($applyTo)
 		
 	Else 
 		
-		$node:=This:C1470._target()
+		// Current
+		$node:=This:C1470._applyTo()
 		
 	End if 
 	
-	If (New collection:C1472(\
-		"rect"; \
-		"line"; \
-		"image"; \
-		"circle"; \
-		"ellipse").indexOf(This:C1470.getName($node))#-1)
+	If ($node#This:C1470.root)
 		
-		$node:=This:C1470.parent($node)
-		
+		If (This:C1470._notContainer.indexOf(This:C1470.getName($node))#-1)
+			
+			$node:=This:C1470.parent($node)
+			
+		End if 
 	End if 
 	
 	//———————————————————————————————————————————————————————————
+	// Looks for element "defs", create if not exists
+Function _defs()->$reference
+	
+	var $node; $root : Text
+	var $c : Collection
+	
+	$c:=This:C1470.findByName("defs")
+	
+	If (This:C1470.success)
+		
+		$reference:=$c[0]
+		
+	Else 
+		
+		$root:=DOM Create XML Ref:C861("root")
+		This:C1470.success:=Bool:C1537(OK)
+		
+		If (This:C1470.success)
+			
+			$node:=Super:C1706.create($root; "defs")
+			
+			If (This:C1470.success)
+				
+				$reference:=Super:C1706.insert(This:C1470.root; $node)
+				
+			End if 
+			
+			DOM CLOSE XML:C722($root)
+			
+		End if 
+	End if 
+	
