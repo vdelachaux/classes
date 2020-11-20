@@ -1,10 +1,9 @@
 Class constructor($variable)
 	
-	This:C1470.root:=Null:C1517
 	This:C1470.autoClose:=True:C214
 	This:C1470.file:=Null:C1517
 	This:C1470.xml:=Null:C1517
-	This:C1470.success:=False:C215
+	This:C1470.success:=True:C214
 	This:C1470.errors:=New collection:C1472
 	
 	If (Count parameters:C259>=1)
@@ -16,6 +15,17 @@ Class constructor($variable)
 		This:C1470.success:=True:C214
 		
 	End if 
+	
+	//———————————————————————————————————————————————————————————
+Function _reset
+	
+	This:C1470.close()
+	
+	This:C1470.autoClose:=True:C214
+	This:C1470.file:=Null:C1517
+	This:C1470.xml:=Null:C1517
+	This:C1470.success:=True:C214
+	This:C1470.errors:=New collection:C1472
 	
 /*———————————————————————————————————————————————————————————*/
 Function new
@@ -273,6 +283,7 @@ Function save
 	var $2 : Boolean
 	
 	var $close : Boolean
+	var $t : Text
 	var $file : 4D:C1709.File
 	
 	If (Count parameters:C259>=2)
@@ -306,8 +317,15 @@ Function save
 	
 	If (This:C1470.success)
 		
-		DOM EXPORT TO FILE:C862(This:C1470.root; $file.platformPath)
+		DOM EXPORT TO VAR:C863(This:C1470.root; $t)
 		This:C1470.success:=Bool:C1537(OK)
+		
+		If (This:C1470.success)
+			
+			This:C1470.xml:=$t
+			$file.setText($t)
+			
+		End if 
 		
 	Else 
 		
@@ -836,35 +854,28 @@ Function lastChild($node : Text; $name : Text)->$reference : Text
 	// —————————————————————————————————————————————————————————————————————————————————
 	// Returns the list of the childs' references of a node or root if ref is omitted
 Function childrens($node : Text)->$childs : Collection
-	var $i : Integer
 	
-	$childs:=New collection:C1472
-	
-	ARRAY LONGINT:C221($types; 0x0000)
 	ARRAY TEXT:C222($nodes; 0x0000)
 	
 	If (Count parameters:C259>=1)
 		
 		If (This:C1470._requiredRef($node))
 			
-			DOM GET XML CHILD NODES:C1081($node; $types; $nodes)
+			$nodes{0}:=$node
 			
 		End if 
+	End if 
+	
+	If (Length:C16($nodes{0})=0)
 		
-	Else 
-		
-		DOM GET XML CHILD NODES:C1081(This:C1470.root; $types; $nodes)
+		$nodes{0}:=This:C1470.root
 		
 	End if 
 	
-	For ($i; 1; Size of array:C274($types); 1)
-		
-		If ($types{$i}=XML ELEMENT:K45:20)
-			
-			$childs.push($nodes{$i})
-			
-		End if 
-	End for 
+	$nodes{0}:=DOM Find XML element:C864($nodes{0}; "*"; $nodes)
+	
+	$childs:=New collection:C1472
+	ARRAY TO COLLECTION:C1563($childs; $nodes)
 	
 	// —————————————————————————————————————————————————————————————————————————————————
 	// Returns the list of the descendant' references of a node or root if ref is omitted
