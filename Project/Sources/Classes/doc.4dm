@@ -32,55 +32,71 @@ Function set($path : Variant; $pathType : Integer)->$this : cs:C1710.doc
 			//_____________________________
 		: (Value type:C1509($path)=Is object:K8:27)  // File or Folder
 			
-			This:C1470._target:=$path
+			If (OB Instance of:C1731($path; 4D:C1709.Folder))\
+				 | (OB Instance of:C1731($path; 4D:C1709.File))
+				
+				This:C1470._target:=$path
+				
+			Else 
+				
+				ASSERT:C1129(False:C215; Current method name:C684+" Path as object must be a File or Folder")
+				
+			End if 
 			
 			//_____________________________
 		: (Value type:C1509($path)=Is text:K8:3)
 			
-			If (Count parameters:C259>=2)
+			If (Length:C16($path)=0)
 				
-				$o:=Path to object:C1547($path; $pathType)
+				This:C1470._target:=Null:C1517
 				
 			Else 
 				
-				// Default is a system path
-				$o:=Path to object:C1547($path)
-				
-			End if 
-			
-			If (Count parameters:C259>=2)
-				
-				If ($o.isFolder)
+				If (Count parameters:C259>=2)
 					
-					// PathType passed: fk posix path or fk platform path
-					This:C1470._target:=Folder:C1567($path; $pathType)
+					$o:=Path to object:C1547($path; $pathType)
 					
 				Else 
 					
-					// PathType passed: fk posix path or fk platform path
-					This:C1470._target:=File:C1566($path; $pathType)
+					// Default is a system path
+					$o:=Path to object:C1547($path)
 					
 				End if 
 				
-			Else 
-				
-				If ($o.isFolder)
+				If (Count parameters:C259>=2)
 					
-					// Default is Fk posix path
-					This:C1470._target:=Folder:C1567($path)
+					If ($o.isFolder)
+						
+						// PathType passed: fk posix path or fk platform path
+						This:C1470._target:=Folder:C1567($path; $pathType)
+						
+					Else 
+						
+						// PathType passed: fk posix path or fk platform path
+						This:C1470._target:=File:C1566($path; $pathType)
+						
+					End if 
 					
 				Else 
 					
-					// Default is Fk posix path
-					This:C1470._target:=File:C1566($path)
-					
+					If ($o.isFolder)
+						
+						// Default is Fk posix path
+						This:C1470._target:=Folder:C1567($path)
+						
+					Else 
+						
+						// Default is Fk posix path
+						This:C1470._target:=File:C1566($path)
+						
+					End if 
 				End if 
 			End if 
 			
 			//_____________________________
 		Else 
 			
-			ASSERT:C1129(False:C215; "path must be a Text, a File or a folder")
+			ASSERT:C1129(False:C215; Current method name:C684+" Path must be a Text, a File or Folder")
 			
 			//_____________________________
 	End case 
@@ -97,7 +113,7 @@ Function copyTo($destinationFolder : Object; $newName : Variant; $overwrite : In
 			//_____________________________
 		: (Count parameters:C259=0)
 			
-			ASSERT:C1129(False:C215; "Missing parameters")
+			ASSERT:C1129(False:C215; Current method name:C684+" Missing parameters")
 			
 			//_____________________________
 		: (Count parameters:C259=1)
@@ -155,7 +171,7 @@ Function createAlias($destinationFolder : 4D:C1709.Folder; $aliasName : Text; $a
 			//________________________
 		Else 
 			
-			ASSERT:C1129(False:C215; "Missing parameterr")
+			ASSERT:C1129(False:C215; Current method name:C684+" Missing parameterr")
 			
 			//______________________________________________________
 	End case 
@@ -197,7 +213,7 @@ Function file($path : Text)->$file : 4D:C1709.file
 		
 	Else 
 		
-		ASSERT:C1129(False:C215; "This is not a folder")
+		ASSERT:C1129(False:C215; Current method name:C684+" This is not a folder")
 		
 	End if 
 	
@@ -221,7 +237,7 @@ Function files($option : Integer)->$files : Collection
 		
 	Else 
 		
-		ASSERT:C1129(False:C215; "This is not a folder")
+		ASSERT:C1129(False:C215; Current method name:C684+" This is not a folder")
 		
 	End if 
 	
@@ -235,7 +251,7 @@ Function folder($path : Text)->$folder : 4D:C1709.Folder
 		
 	Else 
 		
-		ASSERT:C1129(False:C215; "This is not a folder")
+		ASSERT:C1129(False:C215; Current method name:C684+" This is not a folder")
 		
 	End if 
 	
@@ -259,7 +275,7 @@ Function folders($option : Integer)->$folders : Collection
 		
 	Else 
 		
-		ASSERT:C1129(False:C215; "This is not a folder")
+		ASSERT:C1129(False:C215; Current method name:C684+" This is not a folder")
 		
 	End if 
 	
@@ -274,7 +290,7 @@ Function getContent()->$content : Blob
 		
 	Else 
 		
-		ASSERT:C1129(False:C215; "This is not a file")
+		ASSERT:C1129(False:C215; Current method name:C684+" This is not a file")
 		
 	End if 
 	
@@ -303,7 +319,7 @@ Function getText()->$text : Text
 		
 	Else 
 		
-		ASSERT:C1129(False:C215; "This is not a file")
+		ASSERT:C1129(False:C215; Current method name:C684+" This is not a file")
 		
 	End if 
 	
@@ -330,7 +346,7 @@ Function rename($newName : Text)->$this : cs:C1710.doc
 		
 	Else 
 		
-		ASSERT:C1129(False:C215; "Missing newName parameter")
+		ASSERT:C1129(False:C215; Current method name:C684+" Missing newName parameter")
 		
 	End if 
 	
@@ -347,7 +363,7 @@ Function setContent($content : Blob)
 		
 	Else 
 		
-		ASSERT:C1129(False:C215; "This is not a file")
+		ASSERT:C1129(False:C215; Current method name:C684+" This is not a file")
 		
 	End if 
 	
@@ -362,15 +378,36 @@ Function setText($text : Text)
 		
 	Else 
 		
-		ASSERT:C1129(False:C215; "This is not a file")
+		ASSERT:C1129(False:C215; Current method name:C684+" This is not a file")
 		
 	End if 
+	
+	//==========================================================
+Function unsandboxed()->$this : cs:C1710.doc
+	
+	If (This:C1470._target#Null:C1517)
+		
+		If (This:C1470.isFile)
+			
+			// Unsandboxed file
+			This:C1470._target:=File:C1566(This:C1470._target.platformPath; fk platform path:K87:2)
+			
+		Else 
+			
+			// Unsandboxed folder
+			This:C1470._target:=Folder:C1567(This:C1470._target.platformPath; fk platform path:K87:2)
+			
+		End if 
+	End if 
+	
+	This:C1470.update()
 	
 	//==========================================================
 Function update()
 	
 	If (This:C1470._target=Null:C1517)
 		
+		// Init/reset
 		This:C1470.creationDate:=!00-00-00!
 		This:C1470.creationTime:=?00:00:00?
 		This:C1470.extension:=""
@@ -381,6 +418,7 @@ Function update()
 		This:C1470.isFile:=False:C215
 		This:C1470.isFolder:=False:C215
 		This:C1470.isPackage:=False:C215
+		This:C1470.isWritable:=False:C215
 		This:C1470.modificationDate:=!00-00-00!
 		This:C1470.modificationTime:=?00:00:00?
 		This:C1470.name:=""
@@ -388,6 +426,9 @@ Function update()
 		This:C1470.parent:=Null:C1517
 		This:C1470.path:=""
 		This:C1470.platformPath:=""
+		This:C1470.isRelative:=False:C215
+		This:C1470.relativePath:=""
+		This:C1470.relativePlatformPath:=""
 		
 	Else 
 		
@@ -400,7 +441,8 @@ Function update()
 		This:C1470.isAlias:=This:C1470._target.isAlias
 		This:C1470.isFile:=This:C1470._target.isFile
 		This:C1470.isFolder:=This:C1470._target.isFolder
-		This:C1470.isPackage:=This:C1470._target.isPackage
+		This:C1470.isPackage:=Bool:C1537(This:C1470._target.isPackage)
+		This:C1470.isWritable:=Choose:C955(This:C1470.isFolder; True:C214/* 🚧 */; This:C1470._target.isWritable)
 		This:C1470.modificationDate:=This:C1470._target.modificationDate
 		This:C1470.modificationTime:=This:C1470._target.modificationTime
 		This:C1470.name:=This:C1470._target.name
@@ -409,4 +451,23 @@ Function update()
 		This:C1470.path:=This:C1470._target.path
 		This:C1470.platformPath:=This:C1470._target.platformPath
 		
+		var $t : Text
+		$t:=Get 4D folder:C485(Database folder UNIX syntax:K5:15; *)
+		
+		If (Position:C15($t; This:C1470.path)=1)
+			
+			This:C1470.isRelative:=True:C214
+			This:C1470.relativePath:=Replace string:C233(This:C1470.path; $t; ""; 1)
+			
+			$t:=Get 4D folder:C485(Database folder:K5:14; *)
+			This:C1470.relativePlatformPath:=Replace string:C233(This:C1470.platformPath; $t; ""; 1)
+			
+		Else 
+			
+			
+			This:C1470.isRelative:=False:C215
+			This:C1470.relativePath:=""
+			This:C1470.relativePlatformPath:=""
+			
+		End if 
 	End if 
