@@ -1,4 +1,4 @@
-Class constructor($variable)
+Class constructor($variable)//
 	
 	This:C1470.autoClose:=True:C214
 	This:C1470.file:=Null:C1517
