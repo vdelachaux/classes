@@ -192,7 +192,7 @@ Else
 					$o.result:=Day of:C23(Add to date:C393(!00-00-00!;Year of:C25($o.date);Month of:C24($o.date)+1;1)-1)
 					
 					  //______________________________________________________
-				: ($1="daysInYear")  // Returns the number of days of the month
+				: ($1="daysInYear")  // Returns the number of days of the year
 					
 					$o.result:=Add to date:C393(!00-00-00!;Year of:C25($o.date);12;31)-Add to date:C393(!00-00-00!;Year of:C25($o.date);1;1)+1
 					
